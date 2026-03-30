@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="192dp"
+    android:height="192dp"
+    android:viewportWidth="192"
+    android:viewportHeight="192">
+    
+    <!-- Background circle -->
+    <path
+        android:fillColor="#B71C1C"
+        android:pathData="M96,0 C149.02,0 192,42.98 192,96 C192,149.02 149.02,192 96,192 C42.98,192 0,149.02 0,96 C0,42.98 42.98,0 96,0 Z" />
+    
+    <!-- Medical cross symbol -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M96,50 L96,142 M50,96 L142,96"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="12"
+        android:strokeLineCap="round" />
+</vector>
