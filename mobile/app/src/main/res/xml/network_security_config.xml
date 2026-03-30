@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Allow cleartext traffic for localhost/development only -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Local emulator -->
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <!-- Physical device localhost -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <!-- Local network IPs (192.168.x.x) -->
+        <domain includeSubdomains="true">192.168.1.0</domain>
+    </domain-config>
+    
+    <!-- Block cleartext for all other domains (production use HTTPS) -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">example.com</domain>
+    </domain-config>
+</network-security-config>
