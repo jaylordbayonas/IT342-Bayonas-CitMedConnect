@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.CitMedConnect" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary_red</item>
+        <item name="colorPrimaryVariant">@color/primary_red_dark</item>
+        <item name="colorSecondary">@color/primary_red</item>
+        <item name="colorSecondaryVariant">@color/primary_red_dark</item>
+        <item name="colorError">@color/error_red</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:statusBarColor">@color/primary_red</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- Primary Colors -->
+    <color name="primary_red">#B71C1C</color>
+    <color name="primary_red_dark">#8B0000</color>
+    <color name="primary_red_light">#D32F2F</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- Background Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="light_gray">#F5F5F5</color>
+    <color name="gray">#EEEEEE</color>
+
+    <!-- UI Colors -->
+    <color name="divider_color">#E0E0E0</color>
+    <color name="error_red">#C62828</color>
+    <color name="icon_color">#9E9E9E</color>
+
+    <!-- Social Colors -->
+    <color name="facebook_blue">#1877F2</color>
+    <color name="google_red">#EA4335</color>
+</resources>
