@@ -65,6 +65,12 @@ public class AuthController {
             userDTO.setPassword(request.getPassword());
             userDTO.setSchoolId(UUID.randomUUID().toString()); // Generate unique ID
             
+            // Set defaults for required fields
+            userDTO.setPhone(""); // Can be updated later by user
+            userDTO.setRole("STUDENT"); // Default role
+            userDTO.setGender("OTHER"); // Can be updated later by user
+            userDTO.setAge(0); // Can be updated later by user
+            
             UserDTO createdUser = userService.createUser(userDTO);
 
             // Prepare response
