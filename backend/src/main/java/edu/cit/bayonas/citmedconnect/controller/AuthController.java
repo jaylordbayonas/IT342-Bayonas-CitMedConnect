@@ -80,7 +80,7 @@ public class AuthController {
                 createdUser.getEmail()
             );
             
-            String token = generateSimpleToken(createdUser.getEmail());
+            String token = generateSimpleToken();
             
             return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new AuthResponse(true, "Registration successful", token, userData));
@@ -126,7 +126,7 @@ public class AuthController {
                 authenticatedUser.getEmail()
             );
             
-            String token = generateSimpleToken(authenticatedUser.getEmail());
+            String token = generateSimpleToken();
 
             return ResponseEntity.ok()
                 .body(new AuthResponse(true, "Login successful", token, userData));
@@ -143,7 +143,7 @@ public class AuthController {
     /**
      * Generate a simple token (replace with JWT in production)
      */
-    private String generateSimpleToken(String email) {
+    private String generateSimpleToken() {
         // Simple token generation - replace with JWT in production
         return UUID.randomUUID().toString();
     }
