@@ -117,10 +117,11 @@ public class UserController {
                 loginRequest.getPassword()
             );
 
-            if (!"staff".equalsIgnoreCase(authenticatedUser.getRole())) {
+            if (!"staff".equalsIgnoreCase(authenticatedUser.getRole())
+                    && !"admin".equalsIgnoreCase(authenticatedUser.getRole())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of(
-                            "error", "Access denied. Staff credentials required.",
+                            "error", "Access denied. Staff or admin credentials required.",
                             "actualRole", authenticatedUser.getRole()
                         ));
             }

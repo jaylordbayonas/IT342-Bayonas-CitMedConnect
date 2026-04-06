@@ -41,9 +41,7 @@ const Login = () => {
     setLoading(true);
     try {
       const result = await login(formData.email.trim(), formData.password, formData.rememberMe);
-      if (result.success) {
-        navigate('/dashboard');
-      } else {
+      if (!result.success) {
         setServerError(result.error || 'Login failed. Please try again.');
       }
     } catch {

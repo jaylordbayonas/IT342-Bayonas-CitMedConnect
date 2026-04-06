@@ -1,0 +1,38 @@
+/* ============================================
+   NOTIFICATION BADGE CSS
+   src/components/common/NotificationBadge.css
+   ============================================ */
+
+.notification-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  margin-left: 8px;
+  position: relative;
+  top: -8px;
+  right: 8px;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  border: 2px solid white;
+  box-sizing: border-box;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.4);
+  }
+}
