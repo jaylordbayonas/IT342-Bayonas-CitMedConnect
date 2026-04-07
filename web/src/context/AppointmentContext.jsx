@@ -11,6 +11,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import PropTypes from 'prop-types';
 import { useAuth } from './AuthContext';
 import AppointmentService from '../services/appointment-service';
 import { transformAppointment, transformTimeSlot } from '../services/data-transformer';
@@ -54,6 +55,42 @@ export const AppointmentProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const loadAppointmentsForRole = useCallback(async (currentUser) => {
+    const actualUserId = currentUser?.userId || currentUser?.schoolId;
+
+    if (isStaffOrAdmin(currentUser?.role)) {
+      return appointmentService.getAllAppointments();
+    }
+
+    if (isStudentRole(currentUser?.role)) {
+      try {
+        return await appointmentService.getStudentAppointments();
+      } catch (studentError) {
+        console.log('Student appointments endpoint failed, using fallback:', studentError);
+        return appointmentService.getUserAppointments(actualUserId);
+      }
+    }
+
+    return appointmentService.getUserAppointments(actualUserId);
+  }, [appointmentService]);
+
+  const loadSlotsForRole = useCallback(async (currentUser) => {
+    if (isStudentRole(currentUser?.role)) {
+      return appointmentService.getAvailableSlots();
+    }
+
+    if (isStaffOrAdmin(currentUser?.role)) {
+      try {
+        return await appointmentService.getStaffSlots();
+      } catch (staffSlotsError) {
+        console.warn('Staff slots endpoint failed, using available slots fallback:', staffSlotsError);
+        return appointmentService.getAvailableSlots();
+      }
+    }
+
+    return [];
+  }, [appointmentService]);
+
   // INITIALIZE DATA - useEffect
   // Load data from API
   useEffect(() => {
@@ -72,58 +109,7 @@ export const AppointmentProvider = ({ children }) => {
         const actualUserId = user?.userId || user?.schoolId;
         console.log('Actual user ID to use:', actualUserId);
         
-        // Load appointments based on user role
-        let appointmentsData = [];
-        if (isStaffOrAdmin(user?.role)) {
-          console.log('Loading all appointments for staff...');
-          try {
-            appointmentsData = await appointmentService.getAllAppointments();
-            console.log('=== STAFF APPOINTMENTS RAW DATA ===');
-            console.log('Total appointments received:', appointmentsData?.length || 0);
-            if (appointmentsData && appointmentsData.length > 0) {
-              console.log('First raw appointment:', appointmentsData[0]);
-              console.log('First appointment structure:');
-              console.log('- appointmentId:', appointmentsData[0].appointmentId);
-              console.log('- status:', appointmentsData[0].status);
-              console.log('- reason:', appointmentsData[0].reason);
-              console.log('- user object:', appointmentsData[0].user);
-              console.log('- user.schoolId:', appointmentsData[0].user?.schoolId);
-              console.log('- timeSlot object:', appointmentsData[0].timeSlot);
-              console.log('- timeSlot.slotDate:', appointmentsData[0].timeSlot?.slotDate);
-              console.log('- timeSlot.startTime:', appointmentsData[0].timeSlot?.startTime);
-            }
-          } catch (staffError) {
-            console.error('Failed to load staff appointments:', staffError);
-            console.error('Error details:', staffError.message);
-            console.error('Error stack:', staffError.stack);
-            appointmentsData = [];
-          }
-        } else if (isStudentRole(user?.role)) {
-          console.log('Loading appointments for student...');
-          console.log('Student user ID:', actualUserId);
-          try {
-            appointmentsData = await appointmentService.getStudentAppointments();
-            console.log('Student appointments data:', appointmentsData);
-            console.log('Student appointments length:', appointmentsData?.length || 0);
-            if (!appointmentsData || appointmentsData.length === 0) {
-              console.log('No appointments from student endpoint, trying fallback...');
-              // Fallback to user appointments endpoint
-              appointmentsData = await appointmentService.getUserAppointments(actualUserId);
-              console.log('User appointments data (fallback):', appointmentsData);
-              console.log('User appointments length (fallback):', appointmentsData?.length || 0);
-            }
-          } catch (studentError) {
-            console.log('Student endpoint failed, trying user appointments:', studentError);
-            // Fallback to user appointments endpoint
-            appointmentsData = await appointmentService.getUserAppointments(actualUserId);
-            console.log('User appointments data (fallback):', appointmentsData);
-            console.log('User appointments length (fallback):', appointmentsData?.length || 0);
-          }
-        } else {
-          console.log('Loading appointments for user:', actualUserId);
-          appointmentsData = await appointmentService.getUserAppointments(actualUserId);
-          console.log('User appointments data:', appointmentsData);
-        }
+        const appointmentsData = await loadAppointmentsForRole(user);
         
         console.log('Raw appointments loaded:', appointmentsData.length, 'appointments');
         console.log('Appointments loaded successfully:', appointmentsData);
@@ -152,25 +138,9 @@ export const AppointmentProvider = ({ children }) => {
         console.log('All transformed appointments:', transformedAppointments);
         setAppointments(transformedAppointments);
         
-        // Load slots based on user role
-        if (isStudentRole(user?.role)) {
-          const slotsData = await appointmentService.getAvailableSlots();
-          const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        } else if (isStaffOrAdmin(user?.role)) {
-          // Staff need to see all slots for management
-          try {
-            const staffSlotsData = await appointmentService.getStaffSlots();
-            const transformedSlots = staffSlotsData.map(slot => transformTimeSlot(slot));
-            setAvailableSlots(transformedSlots);
-          } catch (staffSlotsError) {
-            console.warn('Failed to load staff slots, trying available slots:', staffSlotsError);
-            // Fallback to available slots if staff slots endpoint fails
-            const slotsData = await appointmentService.getAvailableSlots();
-            const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-            setAvailableSlots(transformedSlots);
-          }
-        }
+        const slotsData = await loadSlotsForRole(user);
+        const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
+        setAvailableSlots(transformedSlots);
         
         console.log('Data loaded successfully');
       } catch (err) {
@@ -186,7 +156,7 @@ export const AppointmentProvider = ({ children }) => {
     return () => {
       isMounted.current = false;
     };
-  }, [user, appointmentService]);
+  }, [user, appointmentService, loadAppointmentsForRole, loadSlotsForRole]);
 
   // COMPUTED VALUES - useMemo
   // ============================================
@@ -282,16 +252,7 @@ export const AppointmentProvider = ({ children }) => {
       setTimeout(async () => {
         try {
           console.log('Refreshing appointments from server...');
-          let appointmentsData = [];
-          if (isStaffOrAdmin(user?.role)) {
-            appointmentsData = await appointmentService.getAllAppointments();
-          } else if (isStudentRole(user?.role)) {
-            try {
-              appointmentsData = await appointmentService.getStudentAppointments();
-            } catch {
-              appointmentsData = await appointmentService.getUserAppointments(user.userId || user.schoolId);
-            }
-          }
+          const appointmentsData = await loadAppointmentsForRole(user);
           const transformedAppointments = appointmentsData.map(apt => transformAppointment(apt));
           console.log('Refreshed appointments:', transformedAppointments);
           setAppointments(transformedAppointments);
@@ -301,35 +262,20 @@ export const AppointmentProvider = ({ children }) => {
       }, 1000);
       
       // Update available slots (refresh)
-      if (isStudentRole(user?.role)) {
-        const slotsData = await appointmentService.getAvailableSlots();
-        const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-        setAvailableSlots(transformedSlots);
-      } else if (isStaffOrAdmin(user?.role)) {
-        // Staff need to see all slots for management
-        try {
-          const staffSlotsData = await appointmentService.getStaffSlots();
-          const transformedSlots = staffSlotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        } catch (staffSlotsError) {
-          console.warn('Failed to load staff slots, trying available slots:', staffSlotsError);
-          // Fallback to available slots if staff slots endpoint fails
-          const slotsData = await appointmentService.getAvailableSlots();
-          const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        }
-      }
+      const slotsData = await loadSlotsForRole(user);
+      const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
+      setAvailableSlots(transformedSlots);
       
       // Create audit log
       await createAuditLog('CREATE', 'appointment', newAppointment.appointmentId, appointmentData);
       
       // Send notification (handled by NotificationContext)
-      window.dispatchEvent(new CustomEvent('appointmentBooked', {
+      globalThis.dispatchEvent(new CustomEvent('appointmentBooked', {
         detail: newAppointment
       }));
       
       // Force a re-render of the appointments list
-      window.dispatchEvent(new Event('appointmentsUpdated'));
+      globalThis.dispatchEvent(new Event('appointmentsUpdated'));
       
       setLoading(false);
       return { 
@@ -344,7 +290,7 @@ export const AppointmentProvider = ({ children }) => {
       setLoading(false);
       return { success: false, error: err.message };
     }
-  }, [user, appointmentService, createAuditLog]);
+  }, [user, appointmentService, createAuditLog, loadAppointmentsForRole, loadSlotsForRole]);
 
   // APPOINTMENT ACTIONS - useCallback
   // ============================================
@@ -400,24 +346,9 @@ export const AppointmentProvider = ({ children }) => {
       ));
       
       // Update available slots
-      if (isStudentRole(user?.role)) {
-        const slotsData = await appointmentService.getAvailableSlots();
-        const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-        setAvailableSlots(transformedSlots);
-      } else if (isStaffOrAdmin(user?.role)) {
-        // Staff need to see all slots for management
-        try {
-          const staffSlotsData = await appointmentService.getStaffSlots();
-          const transformedSlots = staffSlotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        } catch (staffSlotsError) {
-          console.warn('Failed to load staff slots, trying available slots:', staffSlotsError);
-          // Fallback to available slots if staff slots endpoint fails
-          const slotsData = await appointmentService.getAvailableSlots();
-          const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        }
-      }
+      const slotsData = await loadSlotsForRole(user);
+      const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
+      setAvailableSlots(transformedSlots);
       
       // Create audit log
       await createAuditLog('UPDATE', 'appointment', appointmentId, { 
@@ -426,7 +357,7 @@ export const AppointmentProvider = ({ children }) => {
       });
       
       // Trigger notification
-      window.dispatchEvent(new CustomEvent('appointmentCancelled', {
+      globalThis.dispatchEvent(new CustomEvent('appointmentCancelled', {
         detail: { appointmentId }
       }));
       
@@ -440,7 +371,7 @@ export const AppointmentProvider = ({ children }) => {
       setLoading(false);
       return { success: false, error: err.message };
     }
-  }, [appointmentService, createAuditLog, user]);
+  }, [appointmentService, createAuditLog, user, loadSlotsForRole]);
   
   /**
    * RESCHEDULE APPOINTMENT (Student and Staff)
@@ -493,7 +424,7 @@ export const AppointmentProvider = ({ children }) => {
       });
       
       // Trigger notification
-      window.dispatchEvent(new CustomEvent('appointmentRescheduled', {
+      globalThis.dispatchEvent(new CustomEvent('appointmentRescheduled', {
         detail: { appointmentId, newSlot }
       }));
       
@@ -541,7 +472,7 @@ export const AppointmentProvider = ({ children }) => {
       });
       
       // Trigger notification to student
-      window.dispatchEvent(new CustomEvent('appointmentCompleted', {
+      globalThis.dispatchEvent(new CustomEvent('appointmentCompleted', {
         detail: { appointmentId }
       }));
       
@@ -583,7 +514,7 @@ export const AppointmentProvider = ({ children }) => {
       });
       
       // Trigger notification to student
-      window.dispatchEvent(new CustomEvent('appointmentSuccess', {
+      globalThis.dispatchEvent(new CustomEvent('appointmentSuccess', {
         detail: { appointmentId }
       }));
       
@@ -652,24 +583,9 @@ export const AppointmentProvider = ({ children }) => {
       console.log('createTimeSlot API response:', response);
       
       // Update available slots
-      if (isStudentRole(user?.role)) {
-        const slotsData = await appointmentService.getAvailableSlots();
-        const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-        setAvailableSlots(transformedSlots);
-      } else if (isStaffOrAdmin(user?.role)) {
-        // Staff need to see all slots for management
-        try {
-          const staffSlotsData = await appointmentService.getStaffSlots();
-          const transformedSlots = staffSlotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        } catch (staffSlotsError) {
-          console.warn('Failed to load staff slots, trying available slots:', staffSlotsError);
-          // Fallback to available slots if staff slots endpoint fails
-          const slotsData = await appointmentService.getAvailableSlots();
-          const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        }
-      }
+      const slotsData = await loadSlotsForRole(user);
+      const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
+      setAvailableSlots(transformedSlots);
       
       // Create audit log
       await createAuditLog('CREATE', 'timeslot', response.timeSlotId, slotData);
@@ -681,7 +597,7 @@ export const AppointmentProvider = ({ children }) => {
       setLoading(false);
       return { success: false, error: err.message };
     }
-  }, [user, appointmentService, createAuditLog]);
+  }, [user, appointmentService, createAuditLog, loadSlotsForRole]);
   
   /**
    * UPDATE TIME SLOT (Staff Only)
@@ -695,24 +611,9 @@ export const AppointmentProvider = ({ children }) => {
       const response = await appointmentService.updateTimeSlot(timeSlotId, slotData);
       
       // Update available slots
-      if (isStudentRole(user?.role)) {
-        const slotsData = await appointmentService.getAvailableSlots();
-        const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-        setAvailableSlots(transformedSlots);
-      } else if (isStaffOrAdmin(user?.role)) {
-        // Staff need to see all slots for management
-        try {
-          const staffSlotsData = await appointmentService.getStaffSlots();
-          const transformedSlots = staffSlotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        } catch (staffSlotsError) {
-          console.warn('Failed to load staff slots, trying available slots:', staffSlotsError);
-          // Fallback to available slots if staff slots endpoint fails
-          const slotsData = await appointmentService.getAvailableSlots();
-          const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        }
-      }
+      const slotsData = await loadSlotsForRole(user);
+      const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
+      setAvailableSlots(transformedSlots);
       
       // Create audit log
       await createAuditLog('UPDATE', 'timeslot', timeSlotId, slotData);
@@ -724,7 +625,7 @@ export const AppointmentProvider = ({ children }) => {
       setLoading(false);
       return { success: false, error: err.message };
     }
-  }, [user, appointmentService, createAuditLog]);
+  }, [user, appointmentService, createAuditLog, loadSlotsForRole]);
 
   /**
    * DELETE TIME SLOT (Staff Only)
@@ -738,24 +639,9 @@ export const AppointmentProvider = ({ children }) => {
       await appointmentService.deleteTimeSlot(timeSlotId);
       
       // Update available slots
-      if (isStudentRole(user?.role)) {
-        const slotsData = await appointmentService.getAvailableSlots();
-        const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-        setAvailableSlots(transformedSlots);
-      } else if (isStaffOrAdmin(user?.role)) {
-        // Staff need to see all slots for management
-        try {
-          const staffSlotsData = await appointmentService.getStaffSlots();
-          const transformedSlots = staffSlotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        } catch (staffSlotsError) {
-          console.warn('Failed to load staff slots, trying available slots:', staffSlotsError);
-          // Fallback to available slots if staff slots endpoint fails
-          const slotsData = await appointmentService.getAvailableSlots();
-          const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-          setAvailableSlots(transformedSlots);
-        }
-      }
+      const slotsData = await loadSlotsForRole(user);
+      const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
+      setAvailableSlots(transformedSlots);
       
       // Create audit log
       await createAuditLog('DELETE', 'timeslot', timeSlotId, {});
@@ -767,7 +653,7 @@ export const AppointmentProvider = ({ children }) => {
       setLoading(false);
       return { success: false, error: err.message };
     }
-  }, [user, appointmentService, createAuditLog]);
+  }, [user, appointmentService, createAuditLog, loadSlotsForRole]);
 
 // REFRESH DATA
 // ============================================
@@ -777,21 +663,7 @@ const refreshAppointments = useCallback(async () => {
   
   setLoading(true);
   try {
-    // Load appointments based on user role
-    let appointmentsData = [];
-    if (isStaffOrAdmin(user?.role)) {
-      appointmentsData = await appointmentService.getAllAppointments();
-    } else if (isStudentRole(user?.role)) {
-      try {
-        appointmentsData = await appointmentService.getStudentAppointments();
-      } catch (studentError) {
-        console.log('Student endpoint failed in refresh, trying user appointments:', studentError);
-        // Fallback to user appointments endpoint
-        appointmentsData = await appointmentService.getUserAppointments(user.userId || user.schoolId);
-      }
-    } else {
-      appointmentsData = await appointmentService.getUserAppointments(user.userId || user.schoolId);
-    }
+    const appointmentsData = await loadAppointmentsForRole(user);
     
     // Transform appointments for frontend compatibility
     const transformedAppointments = appointmentsData.map(apt => 
@@ -799,22 +671,9 @@ const refreshAppointments = useCallback(async () => {
     );
     setAppointments(transformedAppointments);
     
-    // Refresh slots based on user role
-    if (isStudentRole(user?.role)) {
-      const slotsData = await appointmentService.getAvailableSlots();
-      const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-      setAvailableSlots(transformedSlots);
-    } else if (isStaffOrAdmin(user?.role)) {
-      try {
-        const staffSlotsData = await appointmentService.getStaffSlots();
-        const transformedSlots = staffSlotsData.map(slot => transformTimeSlot(slot));
-        setAvailableSlots(transformedSlots);
-      } catch (staffError) {
-        const slotsData = await appointmentService.getAvailableSlots();
-        const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
-        setAvailableSlots(transformedSlots);
-      }
-    }
+    const slotsData = await loadSlotsForRole(user);
+    const transformedSlots = slotsData.map(slot => transformTimeSlot(slot));
+    setAvailableSlots(transformedSlots);
     
     setError(null);
   } catch (err) {
@@ -823,7 +682,7 @@ const refreshAppointments = useCallback(async () => {
   } finally {
     setLoading(false);
   }
-}, [user, appointmentService]);
+}, [user, appointmentService, loadAppointmentsForRole, loadSlotsForRole]);
 
 // CONTEXT VALUE - useMemo
 // ============================================
@@ -867,5 +726,9 @@ const refreshAppointments = useCallback(async () => {
 };
 
 export { AppointmentContext };
+AppointmentProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
 export default AppointmentContext;
 

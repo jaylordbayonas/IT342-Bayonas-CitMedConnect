@@ -2,7 +2,6 @@ package edu.cit.bayonas.citmedconnect.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -15,6 +14,7 @@ import edu.cit.bayonas.citmedconnect.entity.NotificationEntity;
 import edu.cit.bayonas.citmedconnect.entity.UserEntity;
 import edu.cit.bayonas.citmedconnect.repository.NotificationRepository;
 import edu.cit.bayonas.citmedconnect.repository.UserRepository;
+import edu.cit.bayonas.citmedconnect.service.notification.NotificationFactory;
 
 
 @Service
@@ -25,6 +25,9 @@ public class NotificationService {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private NotificationFactory notificationFactory;
     
     public NotificationEntity createNotification(NotificationEntity notification) {
         if (notification == null) {
@@ -149,14 +152,13 @@ public class NotificationService {
         
         for (UserEntity student : students) {
             if (currentUserSchoolId == null || !student.getSchoolId().equals(currentUserSchoolId)) {
-                NotificationEntity notification = new NotificationEntity();
-                notification.setNotificationId(UUID.randomUUID().toString());
-                notification.setSchoolId(student.getSchoolId());
-                notification.setTitle(title);
-                notification.setMessage(message);
-                notification.setNotificationType(type);
-                notification.setIsGlobal(false);
-                notification.setCreatedAt(LocalDateTime.now());
+                NotificationEntity notification = notificationFactory.create(
+                    student.getSchoolId(),
+                    title,
+                    message,
+                    type,
+                    false
+                );
                 
                 notifications.add(notificationRepository.save(notification));
                 System.out.println("DEBUG: Sent notification to: " + student.getSchoolId() + " with type: " + type);
@@ -185,14 +187,13 @@ public class NotificationService {
         
         for (UserEntity user : allUsers) {
             if (currentUserSchoolId == null || !user.getSchoolId().equals(currentUserSchoolId)) {
-                NotificationEntity notification = new NotificationEntity();
-                notification.setNotificationId(UUID.randomUUID().toString());
-                notification.setSchoolId(user.getSchoolId());
-                notification.setTitle(title);
-                notification.setMessage(message);
-                notification.setNotificationType(type);
-                notification.setIsGlobal(true);
-                notification.setCreatedAt(LocalDateTime.now());
+                NotificationEntity notification = notificationFactory.create(
+                    user.getSchoolId(),
+                    title,
+                    message,
+                    type,
+                    true
+                );
                 
                 notifications.add(notificationRepository.save(notification));
                 System.out.println("DEBUG: Sent notification to: " + user.getSchoolId() + " with type: " + type);
@@ -233,15 +234,14 @@ public class NotificationService {
     public NotificationEntity sendNotificationToUser(String recipientId, String title, String message, String type) {
         userRepository.findById(recipientId)
             .orElseThrow(() -> new RuntimeException("User not found with school_id: " + recipientId));
-        
-        NotificationEntity notification = new NotificationEntity();
-        notification.setNotificationId(UUID.randomUUID().toString());
-        notification.setSchoolId(recipientId);
-        notification.setTitle(title);
-        notification.setMessage(message);
-        notification.setNotificationType(type);
-        notification.setIsGlobal(false);
-        notification.setCreatedAt(LocalDateTime.now());
+
+        NotificationEntity notification = notificationFactory.create(
+            recipientId,
+            title,
+            message,
+            type,
+            false
+        );
         
         NotificationEntity saved = notificationRepository.save(notification);
         System.out.println("Notification sent to user: " + recipientId + " with type: " + type);
@@ -275,14 +275,13 @@ public class NotificationService {
         for (UserEntity staff : allStaff) {
             // DON'T send to yourself!
             if (currentUserSchoolId == null || !staff.getSchoolId().equals(currentUserSchoolId)) {
-                NotificationEntity notification = new NotificationEntity();
-                notification.setNotificationId(UUID.randomUUID().toString());
-                notification.setSchoolId(staff.getSchoolId());
-                notification.setTitle(title);
-                notification.setMessage(message);
-                notification.setNotificationType(type);
-                notification.setIsGlobal(false);
-                notification.setCreatedAt(LocalDateTime.now());
+                NotificationEntity notification = notificationFactory.create(
+                    staff.getSchoolId(),
+                    title,
+                    message,
+                    type,
+                    false
+                );
                 
                 notifications.add(notificationRepository.save(notification));
                 System.out.println("DEBUG: Sent notification to: " + staff.getSchoolId() + " with type: " + type);
