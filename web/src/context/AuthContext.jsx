@@ -11,7 +11,7 @@ import React, {
   useRef 
 } from 'react';
 import PropTypes from 'prop-types';
-import { generateId } from '../types';
+import { generateId } from '../types/index.js';
 import { userService } from '../services/userService';
 
 const AuthContext = createContext(null);

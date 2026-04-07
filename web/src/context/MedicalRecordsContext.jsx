@@ -13,7 +13,7 @@ import React, {
   useContext
 } from 'react';
 import { useAuth } from './AuthContext';
-import { generateId } from '../types';
+import { generateId } from '../types/index.js';
 
 const MedicalRecordsContext = createContext(null);
 

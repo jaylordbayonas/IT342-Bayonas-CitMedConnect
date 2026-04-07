@@ -17,7 +17,7 @@ import AppointmentService from '../services/appointment-service';
 import { transformAppointment, transformTimeSlot } from '../services/data-transformer';
 import { 
   APPOINTMENT_STATUS,
-} from '../types';
+} from '../types/index.js';
 
 // Create Context
 const AppointmentContext = createContext(null);
