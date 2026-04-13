@@ -32,6 +32,12 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = true)
+    private String oauthProvider;
+
+    @Column(nullable = true)
+    private String oauthId;
+
     @Column(nullable = false)
     private String role;
 
@@ -127,5 +133,21 @@ public class UserEntity {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getOauthProvider() {
+        return oauthProvider;
+    }
+
+    public void setOauthProvider(String oauthProvider) {
+        this.oauthProvider = oauthProvider;
+    }
+
+    public String getOauthId() {
+        return oauthId;
+    }
+
+    public void setOauthId(String oauthId) {
+        this.oauthId = oauthId;
     }
 }
