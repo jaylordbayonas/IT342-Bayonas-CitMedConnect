@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
 import {
   getAuthorizationCode,
   validateOAuthState,
+  exchangeCodeForToken,
   authenticateWithGithubToken,
 } from '../services/github-oauth-service';
 import '../pages/OAuth2Callback.css';
 
 const OAuth2Callback = () => {
   const navigate = useNavigate();
-  const { login: authLogin } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -30,20 +29,7 @@ const OAuth2Callback = () => {
           throw new Error('Invalid OAuth state - potential CSRF attack');
         }
 
-        // Exchange code for token (backend endpoint)
-        const tokenResponse = await fetch('/api/auth/oauth2/github/exchange-code', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ code }),
-        });
-
-        if (!tokenResponse.ok) {
-          throw new Error('Failed to exchange authorization code');
-        }
-
-        const { accessToken } = await tokenResponse.json();
+        const accessToken = await exchangeCodeForToken(code);
 
         // Authenticate with GitHub token
         const authResponse = await authenticateWithGithubToken(accessToken);
@@ -63,7 +49,7 @@ const OAuth2Callback = () => {
 
         // Redirect to dashboard
         setTimeout(() => {
-          navigate('/dashboard', { replace: true });
+          window.location.replace('/dashboard');
         }, 500);
       } catch (err) {
         console.error('OAuth2 callback error:', err);
@@ -79,7 +65,7 @@ const OAuth2Callback = () => {
     };
 
     handleCallback();
-  }, [navigate, authLogin]);
+  }, [navigate]);
 
   return (
     <div className="oauth2-callback-container">

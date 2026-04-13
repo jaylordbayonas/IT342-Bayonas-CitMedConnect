@@ -3,7 +3,7 @@
  * Handles OAuth2 flow with GitHub
  */
 
-const GITHUB_CLIENT_ID = 'Ov23liMMOX0oCIllvWnK';
+const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
 const GITHUB_AUTH_URL = 'https://github.com/login/oauth/authorize';
 const REDIRECT_URI = `${window.location.origin}/oauth2/callback/github`;
 
@@ -12,6 +12,9 @@ const REDIRECT_URI = `${window.location.origin}/oauth2/callback/github`;
  * Redirects user to GitHub authorization page
  */
 export const initiateGitHubLogin = () => {
+  if (!GITHUB_CLIENT_ID) {
+    throw new Error('Missing VITE_GITHUB_CLIENT_ID');
+  }
   const scope = 'user:email,read:user';
   const state = generateRandomState();
   

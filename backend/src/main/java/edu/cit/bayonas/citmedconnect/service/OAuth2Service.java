@@ -17,9 +17,6 @@ public class OAuth2Service {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private UserService userService;
-
     private static final String GITHUB_API_URL = "https://api.github.com/user";
     private static final String GITHUB_PROVIDER = "github";
 
