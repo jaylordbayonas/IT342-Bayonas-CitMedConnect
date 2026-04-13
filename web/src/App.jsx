@@ -6,8 +6,6 @@ import { AuditLogProvider } from './context/AuditLogContext';
 import { AppointmentProvider } from './context/AppointmentContext';
 import Layout from './components/common/layout/Layout';
 import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Appointments from './pages/Appointments';
 import Notifications from './pages/Notifications';
@@ -24,7 +22,7 @@ const ProtectedRoute = ({ children }) => {
       </div>
     );
   }
-  return user ? children : <Navigate to="/login" replace />;
+  return user ? children : <Navigate to="/" replace />;
 };
 
 const ProtectedLayout = ({ children }) => (
@@ -36,8 +34,6 @@ const ProtectedLayout = ({ children }) => (
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Landing />} />
-    <Route path="/login" element={<Login />} />
-    <Route path="/register" element={<Register />} />
     <Route path="/dashboard" element={<ProtectedLayout><Dashboard /></ProtectedLayout>} />
     <Route path="/appointments" element={<ProtectedLayout><Appointments /></ProtectedLayout>} />
     <Route path="/notifications" element={<ProtectedLayout><Notifications /></ProtectedLayout>} />

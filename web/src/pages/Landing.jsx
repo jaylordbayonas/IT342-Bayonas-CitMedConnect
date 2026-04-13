@@ -1,9 +1,11 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 import {
   Settings, Stethoscope, Calendar, Users, Shield, Clock,
   ChevronRight, Sparkles, Activity, Heart, Zap, Award,
-  CheckCircle2, Star, TrendingUp, Globe
+  CheckCircle2, Star, TrendingUp, Globe, Mail, Lock, Eye, EyeOff
 } from 'lucide-react';
 import './Landing.css';
 
@@ -11,42 +13,232 @@ const logo = '/images/logo.jpg';
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { login, register, user, loading: authLoading } = useAuth();
+
+  const [activeTab, setActiveTab] = useState('login');
   const [isScrolled, setIsScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [loginData, setLoginData] = useState({
+    schoolId: '',
+    password: '',
+    rememberMe: false,
+  });
+
+  const [registerData, setRegisterData] = useState({
+    schoolId: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    gender: '',
+    age: '',
+    password: '',
+    confirmPassword: '',
+    role: 'student',
+  });
+
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    if (user && !authLoading) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
       if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 20);
+        globalThis.requestAnimationFrame(() => {
+          setIsScrolled(globalThis.scrollY > 20);
           ticking = false;
         });
         ticking = true;
       }
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    globalThis.addEventListener('scroll', handleScroll, { passive: true });
+    return () => globalThis.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePosition({
-        x: (e.clientX / window.innerWidth) * 20,
-        y: (e.clientY / window.innerHeight) * 20
+        x: (e.clientX / globalThis.innerWidth) * 20,
+        y: (e.clientY / globalThis.innerHeight) * 20
       });
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    globalThis.addEventListener('mousemove', handleMouseMove);
+    return () => globalThis.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   const handleNavLinkClick = useCallback((e, section) => {
     e.preventDefault();
     const element = document.querySelector(`#${section}`);
     if (element) {
-      const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - 100;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      const offsetPosition = element.getBoundingClientRect().top + globalThis.pageYOffset - 100;
+      globalThis.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     }
+  }, []);
+
+  const handleLoginChange = useCallback((e) => {
+    const { name, value, type, checked } = e.target;
+    setLoginData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+    setServerError('');
+  }, [errors]);
+
+  const validateLogin = useCallback(() => {
+    const newErrors = {};
+    if (!loginData.schoolId.trim()) newErrors.schoolId = 'Email is required';
+    if (!loginData.password) newErrors.password = 'Password is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [loginData]);
+
+  const handleLogin = useCallback(async (e) => {
+    e.preventDefault();
+    setServerError('');
+
+    if (!validateLogin()) return;
+
+    setLoading(true);
+    try {
+      const result = await login(loginData.schoolId.trim(), loginData.password, loginData.rememberMe);
+      if (!result.success) {
+        setServerError(result.error || 'Login failed. Please try again.');
+      }
+    } catch {
+      setServerError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [loginData, login, validateLogin]);
+
+  const handleRegisterChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setRegisterData((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+    setServerError('');
+    setSuccess('');
+  }, [errors]);
+
+  const validateRegister = useCallback(() => {
+    const newErrors = {};
+
+    if (!registerData.schoolId.trim()) {
+      newErrors.schoolId = 'School ID is required';
+    }
+    if (!registerData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+    if (!registerData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+    if (!/^[a-z]+\.[a-z]+@cit\.edu$/i.test(registerData.email)) {
+      newErrors.email = 'Must be in format: firstname.lastname@cit.edu';
+    }
+    if (!/^\d{7,15}$/.test(registerData.phone.replaceAll(/[-\s+()]/g, ''))) {
+      newErrors.phone = 'Enter a valid phone number';
+    }
+    if (!registerData.gender) {
+      newErrors.gender = 'Please select a gender';
+    }
+    const ageNum = Number.parseInt(registerData.age, 10);
+    if (!registerData.age || Number.isNaN(ageNum) || ageNum < 15 || ageNum > 100) {
+      newErrors.age = 'Enter a valid age (15-100)';
+    }
+    if (registerData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    if (registerData.password !== registerData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [registerData]);
+
+  const handleRegister = useCallback(async (e) => {
+    e.preventDefault();
+    setServerError('');
+    setSuccess('');
+
+    if (!validateRegister()) return;
+
+    setLoading(true);
+    try {
+      const result = await register({
+        schoolId: registerData.schoolId.trim(),
+        firstName: registerData.firstName.trim(),
+        lastName: registerData.lastName.trim(),
+        email: registerData.email.trim().toLowerCase(),
+        phone: registerData.phone.trim(),
+        gender: registerData.gender,
+        age: Number.parseInt(registerData.age, 10),
+        password: registerData.password,
+        confirmPassword: registerData.confirmPassword,
+        role: registerData.role,
+      });
+
+      if (result?.success) {
+        setSuccess(`Registration successful! Your School ID is: ${result.user.schoolId}. You can now log in.`);
+        setRegisterData({
+          schoolId: '',
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          gender: '',
+          age: '',
+          password: '',
+          confirmPassword: '',
+          role: 'student',
+        });
+        setTimeout(() => {
+          setActiveTab('login');
+          setSuccess('');
+        }, 3000);
+      } else {
+        setServerError(result?.error || 'Registration failed. Please try again.');
+      }
+    } catch (error) {
+      setServerError(error.message || 'An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [register, registerData, validateRegister]);
+
+  const handleTabChange = useCallback((tab) => {
+    setActiveTab(tab);
+    setErrors({});
+    setServerError('');
+    setSuccess('');
+  }, []);
+
+  const handleGetStarted = useCallback(() => {
+    setActiveTab('register');
+    setTimeout(() => {
+      const authCard = document.querySelector('.auth-card');
+      if (authCard) {
+        authCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 120);
   }, []);
 
   const features = [
@@ -161,19 +353,43 @@ const Landing = () => {
     ]
   };
 
+  if (authLoading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner" />
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="landing-page">
       <Navigation
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
         onNavLinkClick={handleNavLinkClick}
         isScrolled={isScrolled}
-        onLogin={() => navigate('/login')}
-        onRegister={() => navigate('/register')}
       />
 
       <HeroSection
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
         mousePosition={mousePosition}
-        onGetStarted={() => navigate('/register')}
-        onLogin={() => navigate('/login')}
+        onGetStarted={handleGetStarted}
+        loginData={loginData}
+        registerData={registerData}
+        handleLoginChange={handleLoginChange}
+        handleRegisterChange={handleRegisterChange}
+        handleLogin={handleLogin}
+        handleRegister={handleRegister}
+        showPassword={showPassword}
+        setShowPassword={setShowPassword}
+        showConfirmPassword={showConfirmPassword}
+        setShowConfirmPassword={setShowConfirmPassword}
+        errors={errors}
+        loading={loading}
+        serverError={serverError}
+        success={success}
       />
 
       <TrustBadges />
@@ -181,7 +397,7 @@ const Landing = () => {
       <BenefitsSection benefits={benefits} />
       <StatsSection stats={stats} />
       <TestimonialsSection testimonials={testimonials} />
-      <CTASection onGetStarted={() => navigate('/register')} />
+      <CTASection onGetStarted={handleGetStarted} />
       <Footer links={footerLinks} />
     </div>
   );
@@ -191,7 +407,7 @@ const Landing = () => {
 // NAVIGATION
 // ============================================
 
-const Navigation = React.memo(({ onNavLinkClick, isScrolled, onLogin, onRegister }) => (
+const Navigation = React.memo(({ activeTab, onTabChange, onNavLinkClick, isScrolled }) => (
   <nav className={`landing-nav ${isScrolled ? 'scrolled' : ''}`}>
     <div className="nav-container">
       <div className="nav-left">
@@ -212,10 +428,6 @@ const Navigation = React.memo(({ onNavLinkClick, isScrolled, onLogin, onRegister
         </div>
       </div>
 
-      <div className="nav-right">
-        <button onClick={onLogin} className="nav-btn nav-btn-ghost">Login</button>
-        <button onClick={onRegister} className="nav-btn nav-btn-primary">Register</button>
-      </div>
     </div>
   </nav>
 ));
@@ -226,7 +438,26 @@ Navigation.displayName = 'Navigation';
 // HERO SECTION
 // ============================================
 
-const HeroSection = React.memo(({ mousePosition, onGetStarted, onLogin }) => (
+const HeroSection = React.memo(({
+  activeTab,
+  onTabChange,
+  mousePosition,
+  onGetStarted,
+  loginData,
+  registerData,
+  handleLoginChange,
+  handleRegisterChange,
+  handleLogin,
+  handleRegister,
+  showPassword,
+  setShowPassword,
+  showConfirmPassword,
+  setShowConfirmPassword,
+  errors,
+  loading,
+  serverError,
+  success,
+}) => (
   <section className="hero-section">
     <div className="hero-gradient-bg">
       <div className="gradient-orb gradient-orb-1" style={{ transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)` }} />
@@ -246,7 +477,7 @@ const HeroSection = React.memo(({ mousePosition, onGetStarted, onLogin }) => (
 
           <h1 className="hero-title">
             Healthcare
-            <span className="title-gradient"> Reimagined</span>
+            {' '}<span className="title-gradient">Reimagined</span>
             <br />
             For Modern Living
           </h1>
@@ -269,9 +500,9 @@ const HeroSection = React.memo(({ mousePosition, onGetStarted, onLogin }) => (
               <ChevronRight className="btn-icon" />
               <div className="btn-shine" />
             </button>
-            <button className="btn-hero-secondary" onClick={onLogin}>
+            <button className="btn-hero-secondary" onClick={() => onTabChange('login')}>
               <Globe className="btn-icon-left" />
-              <span>Sign In</span>
+              <span>Watch Demo</span>
             </button>
           </div>
 
@@ -294,9 +525,27 @@ const HeroSection = React.memo(({ mousePosition, onGetStarted, onLogin }) => (
           </div>
         </div>
 
-        {/* Decorative visual instead of auth form */}
         <div className="hero-right">
-          <HeroVisual />
+          <div className="hero-visual">
+            <AuthCard
+              activeTab={activeTab}
+              onTabChange={onTabChange}
+              loginData={loginData}
+              registerData={registerData}
+              handleLoginChange={handleLoginChange}
+              handleRegisterChange={handleRegisterChange}
+              handleLogin={handleLogin}
+              handleRegister={handleRegister}
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+              showConfirmPassword={showConfirmPassword}
+              setShowConfirmPassword={setShowConfirmPassword}
+              errors={errors}
+              loading={loading}
+              serverError={serverError}
+              success={success}
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -306,40 +555,331 @@ const HeroSection = React.memo(({ mousePosition, onGetStarted, onLogin }) => (
 HeroSection.displayName = 'HeroSection';
 
 // ============================================
-// HERO VISUAL (replaces auth card)
+// AUTH CARD
 // ============================================
 
-const HeroVisual = React.memo(() => (
-  <div className="hero-visual">
-    <div className="hv-card hv-card-1">
-      <div className="hv-icon-wrap"><Calendar size={28} /></div>
-      <div className="hv-text">
-        <span className="hv-num">24/7</span>
-        <span className="hv-label">Instant Booking</span>
+const AuthCard = React.memo(({
+  activeTab,
+  onTabChange,
+  loginData,
+  registerData,
+  handleLoginChange,
+  handleRegisterChange,
+  handleLogin,
+  handleRegister,
+  showPassword,
+  setShowPassword,
+  showConfirmPassword,
+  setShowConfirmPassword,
+  errors,
+  loading,
+  serverError,
+  success,
+}) => (
+  <div className="auth-card">
+    <div className="auth-card-glow" />
+
+    <div className="auth-tabs">
+      <button
+        type="button"
+        className={`auth-tab ${activeTab === 'login' ? 'active' : ''}`}
+        onClick={() => onTabChange('login')}
+      >
+        Login
+      </button>
+      <button
+        type="button"
+        className={`auth-tab ${activeTab === 'register' ? 'active' : ''}`}
+        onClick={() => onTabChange('register')}
+      >
+        Register
+      </button>
+    </div>
+
+    <div className={`auth-form ${activeTab === 'login' ? 'active' : ''}`}>
+      <div className="auth-header">
+        <h2>Welcome Back</h2>
+        <p>Sign in to access your account</p>
+      </div>
+
+      <form onSubmit={handleLogin} className="auth-form-content">
+        {serverError && <div className="error-message">{serverError}</div>}
+        {success && <div className="success-message">{success}</div>}
+
+        <div className="form-group">
+          <div className="input-wrapper">
+            <Mail size={18} className="input-icon" />
+            <input
+              type="text"
+              name="schoolId"
+              placeholder="firstname.lastname@cit.edu"
+              value={loginData.schoolId}
+              onChange={handleLoginChange}
+              className={`form-input ${errors.schoolId ? 'error' : ''}`}
+              disabled={loading}
+              autoComplete="username"
+            />
+          </div>
+          {errors.schoolId && <span className="form-error">{errors.schoolId}</span>}
+        </div>
+
+        <div className="form-group">
+          <div className="input-wrapper">
+            <Lock size={18} className="input-icon" />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Password"
+              value={loginData.password}
+              onChange={handleLoginChange}
+              className={`form-input ${errors.password ? 'error' : ''}`}
+              disabled={loading}
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+              tabIndex="-1"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {errors.password && <span className="form-error">{errors.password}</span>}
+        </div>
+
+        <div className="form-options">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              name="rememberMe"
+              checked={loginData.rememberMe}
+              onChange={handleLoginChange}
+              disabled={loading}
+            />
+            <span>Remember me</span>
+          </label>
+        </div>
+
+        <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
+          {loading ? (
+            <>
+              <div className="btn-spinner" />
+              <span>Signing in...</span>
+            </>
+          ) : (
+            'Sign In'
+          )}
+        </button>
+      </form>
+
+      <div className="auth-switch">
+        <p>
+          Don&apos;t have an account?{' '}
+          <button type="button" onClick={() => onTabChange('register')} className="auth-switch-link">
+            Sign up
+          </button>
+        </p>
       </div>
     </div>
 
-    <div className="hv-card hv-card-2">
-      <div className="hv-icon-wrap"><Users size={28} /></div>
-      <div className="hv-text">
-        <span className="hv-num">50K+</span>
-        <span className="hv-label">Active Users</span>
+    <div className={`auth-form ${activeTab === 'register' ? 'active' : ''}`}>
+      <div className="auth-header">
+        <h2>Create Account</h2>
+        <p>Register to get started</p>
       </div>
-    </div>
 
-    <div className="hv-card hv-card-3">
-      <div className="hv-icon-wrap"><Heart size={28} /></div>
-      <div className="hv-text">
-        <span className="hv-num">99.8%</span>
-        <span className="hv-label">Satisfaction</span>
-      </div>
-    </div>
+      <form onSubmit={handleRegister} className="auth-form-content">
+        {serverError && <div className="error-message">{serverError}</div>}
+        {success && <div className="success-message">{success}</div>}
 
-    <div className="hv-card hv-card-4">
-      <div className="hv-icon-wrap"><Shield size={28} /></div>
-      <div className="hv-text">
-        <span className="hv-num">HIPAA</span>
-        <span className="hv-label">Compliant</span>
+        <div className="form-group">
+          <div className="input-wrapper">
+            <Mail size={18} className="input-icon" />
+            <input
+              type="text"
+              name="schoolId"
+              placeholder="School ID (e.g. 21-1234-567)"
+              value={registerData.schoolId}
+              onChange={handleRegisterChange}
+              className={`form-input ${errors.schoolId ? 'error' : ''}`}
+              disabled={loading}
+            />
+          </div>
+          {errors.schoolId && <span className="form-error">{errors.schoolId}</span>}
+        </div>
+
+        <div className="auth-row">
+          <div className="form-group">
+            <div className="input-wrapper">
+              <Mail size={18} className="input-icon" />
+              <input
+                type="text"
+                name="firstName"
+                placeholder="First Name"
+                value={registerData.firstName}
+                onChange={handleRegisterChange}
+                className={`form-input ${errors.firstName ? 'error' : ''}`}
+                disabled={loading}
+              />
+            </div>
+            {errors.firstName && <span className="form-error">{errors.firstName}</span>}
+          </div>
+
+          <div className="form-group">
+            <div className="input-wrapper">
+              <Mail size={18} className="input-icon" />
+              <input
+                type="text"
+                name="lastName"
+                placeholder="Last Name"
+                value={registerData.lastName}
+                onChange={handleRegisterChange}
+                className={`form-input ${errors.lastName ? 'error' : ''}`}
+                disabled={loading}
+              />
+            </div>
+            {errors.lastName && <span className="form-error">{errors.lastName}</span>}
+          </div>
+        </div>
+
+        <div className="form-group">
+          <div className="input-wrapper">
+            <Mail size={18} className="input-icon" />
+            <input
+              type="email"
+              name="email"
+              placeholder="firstname.lastname@cit.edu"
+              value={registerData.email}
+              onChange={handleRegisterChange}
+              className={`form-input ${errors.email ? 'error' : ''}`}
+              disabled={loading}
+              autoComplete="email"
+            />
+          </div>
+          {errors.email && <span className="form-error">{errors.email}</span>}
+        </div>
+
+        <div className="auth-row">
+          <div className="form-group">
+            <div className="input-wrapper">
+              <Mail size={18} className="input-icon" />
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                value={registerData.phone}
+                onChange={handleRegisterChange}
+                className={`form-input ${errors.phone ? 'error' : ''}`}
+                disabled={loading}
+              />
+            </div>
+            {errors.phone && <span className="form-error">{errors.phone}</span>}
+          </div>
+
+          <div className="form-group">
+            <select
+              name="gender"
+              value={registerData.gender}
+              onChange={handleRegisterChange}
+              className={`auth-select ${errors.gender ? 'error' : ''}`}
+              disabled={loading}
+            >
+              <option value="">Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other / Prefer not to say</option>
+            </select>
+            {errors.gender && <span className="form-error">{errors.gender}</span>}
+          </div>
+        </div>
+
+        <div className="form-group">
+          <div className="input-wrapper">
+            <input
+              type="number"
+              name="age"
+              placeholder="Age"
+              value={registerData.age}
+              onChange={handleRegisterChange}
+              className={`form-input no-icon ${errors.age ? 'error' : ''}`}
+              disabled={loading}
+              min="15"
+              max="100"
+            />
+          </div>
+          {errors.age && <span className="form-error">{errors.age}</span>}
+        </div>
+
+        <div className="form-group">
+          <div className="input-wrapper">
+            <Lock size={18} className="input-icon" />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Password (min 6 characters)"
+              value={registerData.password}
+              onChange={handleRegisterChange}
+              className={`form-input ${errors.password ? 'error' : ''}`}
+              disabled={loading}
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+              tabIndex="-1"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {errors.password && <span className="form-error">{errors.password}</span>}
+        </div>
+
+        <div className="form-group">
+          <div className="input-wrapper">
+            <Lock size={18} className="input-icon" />
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={registerData.confirmPassword}
+              onChange={handleRegisterChange}
+              className={`form-input ${errors.confirmPassword ? 'error' : ''}`}
+              disabled={loading}
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              tabIndex="-1"
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {errors.confirmPassword && <span className="form-error">{errors.confirmPassword}</span>}
+        </div>
+
+        <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
+          {loading ? (
+            <>
+              <div className="btn-spinner" />
+              <span>Creating account...</span>
+            </>
+          ) : (
+            'Create Account'
+          )}
+        </button>
+      </form>
+
+      <div className="auth-switch">
+        <p>
+          Already have an account?{' '}
+          <button type="button" onClick={() => onTabChange('login')} className="auth-switch-link">
+            Sign in
+          </button>
+        </p>
       </div>
     </div>
 
@@ -349,7 +889,7 @@ const HeroVisual = React.memo(() => (
   </div>
 ));
 
-HeroVisual.displayName = 'HeroVisual';
+AuthCard.displayName = 'AuthCard';
 
 // ============================================
 // TRUST BADGES

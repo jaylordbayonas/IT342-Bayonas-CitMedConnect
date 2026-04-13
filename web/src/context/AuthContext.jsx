@@ -135,6 +135,9 @@ export const AuthProvider = ({ children }) => {
   // ============================================
   
   useEffect(() => {
+    // StrictMode mounts effects twice in development; reset this flag on each effect run.
+    isMounted.current = true;
+
     const initAuth = async () => {
       if (!isMounted.current) return;
       
@@ -215,8 +218,8 @@ export const AuthProvider = ({ children }) => {
       const loginResult = await userService.login(email, password);
       
       if (loginResult.success && loginResult.data) {
-        // Login successful - user authenticated with correct password
-        const foundUser = loginResult.data;
+        // Login successful - support both {user: ...} and plain user payloads
+        const foundUser = loginResult.data.user || loginResult.data;
         
         // Set session expiry
         const expiryDuration = rememberMe ? 24 * 60 * 60 * 1000 : 2 * 60 * 60 * 1000;
