@@ -1,6 +1,11 @@
 package edu.cit.bayonas.citmedconnect.controller;
 
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.web.client.RestClient;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -98,6 +103,67 @@ public class OAuth2Controller {
         return UUID.randomUUID().toString();
     }
 
+        /**
+         * Exchange GitHub authorization code for access token
+         * POST /api/auth/oauth2/github/exchange-code
+         * 
+         * Expects: { "code": "github_authorization_code" }
+         * Returns: { "accessToken": "github_access_token" }
+         */
+        @PostMapping("/github/exchange-code")
+        public ResponseEntity<Map<String, String>> exchangeCodeForToken(@RequestBody CodeExchangeRequest request) {
+            try {
+                if (request.getCode() == null || request.getCode().trim().isEmpty()) {
+                    return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Authorization code is required"));
+                }
+
+                // Exchange code for access token with GitHub
+                RestClient restClient = RestClient.create();
+                String response = restClient.post()
+                    .uri("https://github.com/login/oauth/access_token")
+                    .header("Accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(Map.of(
+                        "client_id", "Ov23liMMOX0oCIllvWnK",
+                        "client_secret", "cb902b8bf3321d0bcb398bae489e3cdbf7192554",
+                        "code", request.getCode()
+                    ))
+                    .retrieve()
+                    .body(String.class);
+
+                // Parse response
+                JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
+            
+                if (jsonResponse.has("error")) {
+                    return ResponseEntity.badRequest()
+                        .body(Map.of("error", jsonResponse.get("error").getAsString()));
+                }
+
+                String accessToken = jsonResponse.get("access_token").getAsString();
+            
+                return ResponseEntity.ok(Map.of("accessToken", accessToken));
+
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to exchange code: " + e.getMessage()));
+            }
+        }
+
+        /**
+         * Request DTO for code exchange
+         */
+        public static class CodeExchangeRequest {
+            private String code;
+
+            public String getCode() {
+                return code;
+            }
+
+            public void setCode(String code) {
+                this.code = code;
+            }
+        }
     /**
      * Request DTO for GitHub OAuth2 callback
      */
