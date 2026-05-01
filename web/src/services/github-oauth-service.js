@@ -3,26 +3,37 @@
  * Handles OAuth2 flow with GitHub
  */
 
-const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
+const GITHUB_CLIENT_ID =
+  import.meta.env.VITE_GITHUB_CLIENT_ID ||
+  'Ov23liMMOX0oCIllvWnK';
 const GITHUB_AUTH_URL = 'https://github.com/login/oauth/authorize';
-const REDIRECT_URI = `${window.location.origin}/oauth2/callback/github`;
+const REDIRECT_URI = import.meta.env.VITE_GITHUB_REDIRECT_URI;
 
 /**
  * Initiate GitHub OAuth2 login
  * Redirects user to GitHub authorization page
  */
 export const initiateGitHubLogin = () => {
-  if (!GITHUB_CLIENT_ID) {
-    throw new Error('Missing VITE_GITHUB_CLIENT_ID');
-  }
   const scope = 'user:email,read:user';
   const state = generateRandomState();
-  
-  // Store state in sessionStorage for validation
+
+  // Store state in both locations so the callback can survive browser quirks.
   sessionStorage.setItem('oauth_state', state);
-  
-  const authUrl = `${GITHUB_AUTH_URL}?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(scope)}&state=${state}`;
-  
+  localStorage.setItem('oauth_state', state);
+
+  const params = new URLSearchParams({
+    client_id: GITHUB_CLIENT_ID,
+    scope,
+    state,
+  });
+
+  // Send redirect_uri only when explicitly provided to prevent mismatches.
+  if (REDIRECT_URI) {
+    params.set('redirect_uri', REDIRECT_URI);
+  }
+
+  const authUrl = `${GITHUB_AUTH_URL}?${params.toString()}`;
+
   window.location.href = authUrl;
 };
 
@@ -33,18 +44,25 @@ export const initiateGitHubLogin = () => {
  */
 export const exchangeCodeForToken = async (code) => {
   try {
-    // Note: This should be done on the backend for security
-    // The backend should have a route to exchange the code
     const response = await fetch('/api/auth/oauth2/github/exchange-code', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, redirectUri: REDIRECT_URI || null }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to exchange code for token');
+      let backendError = 'Failed to exchange code for token';
+      try {
+        const errBody = await response.json();
+        if (errBody?.error) {
+          backendError = errBody.error;
+        }
+      } catch {
+        // Keep fallback message when backend response is not JSON.
+      }
+      throw new Error(backendError);
     }
 
     const data = await response.json();
@@ -98,8 +116,9 @@ function generateRandomState() {
  * @returns {boolean} True if state is valid
  */
 export const validateOAuthState = (state) => {
-  const storedState = sessionStorage.getItem('oauth_state');
+  const storedState = sessionStorage.getItem('oauth_state') || localStorage.getItem('oauth_state');
   sessionStorage.removeItem('oauth_state');
+  localStorage.removeItem('oauth_state');
   return state === storedState;
 };
 

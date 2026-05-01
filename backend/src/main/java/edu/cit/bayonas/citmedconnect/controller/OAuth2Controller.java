@@ -4,7 +4,12 @@ import java.util.UUID;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -126,15 +131,19 @@ public class OAuth2Controller {
             }
 
             RestClient restClient = RestClient.create();
+            MultiValueMap<String, String> payload = new LinkedMultiValueMap<>();
+            payload.add("client_id", githubClientId);
+            payload.add("client_secret", githubClientSecret);
+            payload.add("code", request.getCode());
+            if (request.getRedirectUri() != null && !request.getRedirectUri().isBlank()) {
+                payload.add("redirect_uri", request.getRedirectUri());
+            }
+
             String response = restClient.post()
                 .uri("https://github.com/login/oauth/access_token")
-                .header("Accept", "application/json")
-                .header("Content-Type", "application/json")
-                .body(Map.of(
-                    "client_id", githubClientId,
-                    "client_secret", githubClientSecret,
-                    "code", request.getCode()
-                ))
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(payload)
                 .retrieve()
                 .body(String.class);
 
@@ -149,6 +158,22 @@ public class OAuth2Controller {
             return ResponseEntity.ok(Map.of("accessToken", accessToken));
 
         } catch (Exception e) {
+            if (e instanceof RestClientResponseException restClientException) {
+                String responseBody = restClientException.getResponseBodyAsString();
+                try {
+                    JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
+                    if (jsonResponse.has("error_description")) {
+                        return ResponseEntity.badRequest()
+                            .body(Map.of("error", jsonResponse.get("error_description").getAsString()));
+                    }
+                    if (jsonResponse.has("error")) {
+                        return ResponseEntity.badRequest()
+                            .body(Map.of("error", jsonResponse.get("error").getAsString()));
+                    }
+                } catch (Exception ignored) {
+                    // Fall through to generic response below.
+                }
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "Failed to exchange code: " + e.getMessage()));
         }
@@ -159,6 +184,7 @@ public class OAuth2Controller {
      */
     public static class CodeExchangeRequest {
         private String code;
+        private String redirectUri;
 
         public String getCode() {
             return code;
@@ -166,6 +192,14 @@ public class OAuth2Controller {
 
         public void setCode(String code) {
             this.code = code;
+        }
+
+        public String getRedirectUri() {
+            return redirectUri;
+        }
+
+        public void setRedirectUri(String redirectUri) {
+            this.redirectUri = redirectUri;
         }
     }
     /**
