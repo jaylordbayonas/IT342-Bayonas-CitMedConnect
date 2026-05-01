@@ -12,6 +12,7 @@ import Notifications from './pages/Notifications';
 import Profile from './pages/Profile';
 import Calendar from './pages/Calendar';
 import MedicalRecords from './pages/MedicalRecords';
+import OAuth2Callback from './pages/OAuth2Callback';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -34,6 +35,7 @@ const ProtectedLayout = ({ children }) => (
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Landing />} />
+      <Route path="/oauth2/callback/github" element={<OAuth2Callback />} />
     <Route path="/dashboard" element={<ProtectedLayout><Dashboard /></ProtectedLayout>} />
     <Route path="/appointments" element={<ProtectedLayout><Appointments /></ProtectedLayout>} />
     <Route path="/notifications" element={<ProtectedLayout><Notifications /></ProtectedLayout>} />

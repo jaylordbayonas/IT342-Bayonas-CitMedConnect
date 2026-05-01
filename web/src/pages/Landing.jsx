@@ -5,8 +5,9 @@ import useAuth from '../hooks/useAuth';
 import {
   Settings, Stethoscope, Calendar, Users, Shield, Clock,
   ChevronRight, Sparkles, Activity, Heart, Zap, Award,
-  CheckCircle2, Star, TrendingUp, Globe, Mail, Lock, Eye, EyeOff
+  CheckCircle2, Star, TrendingUp, Globe, Mail, Lock, Eye, EyeOff, Github
 } from 'lucide-react';
+import { initiateGitHubLogin } from '../services/github-oauth-service';
 import './Landing.css';
 
 const logo = '/images/logo.jpg';
@@ -671,6 +672,20 @@ const AuthCard = React.memo(({
             'Sign In'
           )}
         </button>
+
+        <div className="oauth-divider">
+          <span>or</span>
+        </div>
+
+        <button
+          type="button"
+          className="btn btn-oauth btn-github"
+          onClick={initiateGitHubLogin}
+          disabled={loading}
+        >
+          <Github size={18} className="oauth-icon" />
+          <span>Sign in with GitHub</span>
+        </button>
       </form>
 
       <div className="auth-switch">
@@ -870,6 +885,20 @@ const AuthCard = React.memo(({
           ) : (
             'Create Account'
           )}
+        </button>
+
+        <div className="oauth-divider">
+          <span>or</span>
+        </div>
+
+        <button
+          type="button"
+          className="btn btn-oauth btn-github"
+          onClick={initiateGitHubLogin}
+          disabled={loading}
+        >
+          <Github size={18} className="oauth-icon" />
+          <span>Sign up with GitHub</span>
         </button>
       </form>
 
