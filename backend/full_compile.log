@@ -1,0 +1,22 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< edu.cit.bayonas:citmedconnect >--------------------
+[INFO] Building citmedconnect 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ citmedconnect ---
+[INFO] Deleting c:\Users\JAYLORD\OneDrive\Desktop\IT342-Bayonas-CitMedConnect\backend\target
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.018 s
+[INFO] Finished at: 2026-05-07T16:30:42+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-clean-plugin:3.4.1:clean (default-clean) on project citmedconnect: Failed to clean project: Failed to delete C:\Users\JAYLORD\OneDrive\Desktop\IT342-Bayonas-CitMedConnect\backend\target\test-classes -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

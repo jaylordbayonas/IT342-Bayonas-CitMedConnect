@@ -12,9 +12,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import edu.cit.bayonas.citmedconnect.entity.NotificationEntity;
-import edu.cit.bayonas.citmedconnect.entity.UserEntity;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
 import edu.cit.bayonas.citmedconnect.repository.NotificationRepository;
-import edu.cit.bayonas.citmedconnect.repository.UserRepository;
+import edu.cit.bayonas.citmedconnect.features.auth.repository.UserRepository;
 
 
 @Service

@@ -1,0 +1,85 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< edu.cit.bayonas:citmedconnect >--------------------
+[INFO] Building citmedconnect 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ citmedconnect ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ citmedconnect ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 39 source files with javac [debug parameters release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[1,1] illegal character: '\ufeff'
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[1,10] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[3,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[4,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[6,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[7,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[8,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[9,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[10,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[11,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[12,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[13,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[14,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[16,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[17,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[18,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[19,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[20,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[21,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[22,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[23,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[25,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[26,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[27,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[28,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[29,1] class, interface, enum, or record expected
+[INFO] 26 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.424 s
+[INFO] Finished at: 2026-05-07T16:23:34+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:compile (default-compile) on project citmedconnect: Compilation failure: Compilation failure: 
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[1,1] illegal character: '\ufeff'
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[1,10] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[3,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[4,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[6,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[7,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[8,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[9,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[10,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[11,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[12,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[13,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[14,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[16,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[17,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[18,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[19,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[20,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[21,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[22,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[23,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[25,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[26,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[27,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[28,1] class, interface, enum, or record expected
+[ERROR] /c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/backend/src/main/java/edu/cit/bayonas/citmedconnect/controller/OAuth2Controller.java:[29,1] class, interface, enum, or record expected
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

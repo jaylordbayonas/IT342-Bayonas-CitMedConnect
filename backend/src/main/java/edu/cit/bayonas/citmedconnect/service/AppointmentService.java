@@ -1,10 +1,10 @@
 package edu.cit.bayonas.citmedconnect.service;
 
 import edu.cit.bayonas.citmedconnect.entity.AppointmentEntity;
-import edu.cit.bayonas.citmedconnect.entity.UserEntity;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
 import edu.cit.bayonas.citmedconnect.entity.TimeSlot;
 import edu.cit.bayonas.citmedconnect.repository.AppointmentRepository;
-import edu.cit.bayonas.citmedconnect.repository.UserRepository;
+import edu.cit.bayonas.citmedconnect.features.auth.repository.UserRepository;
 import edu.cit.bayonas.citmedconnect.repository.TimeSlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

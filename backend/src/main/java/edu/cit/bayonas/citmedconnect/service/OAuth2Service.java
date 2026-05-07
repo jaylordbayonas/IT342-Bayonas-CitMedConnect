@@ -8,8 +8,8 @@ import org.springframework.web.client.RestClient;
 
 import edu.cit.bayonas.citmedconnect.dto.GitHubOAuth2UserInfo;
 import edu.cit.bayonas.citmedconnect.dto.UserDTO;
-import edu.cit.bayonas.citmedconnect.entity.UserEntity;
-import edu.cit.bayonas.citmedconnect.repository.UserRepository;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
+import edu.cit.bayonas.citmedconnect.features.auth.repository.UserRepository;
 
 @Service
 public class OAuth2Service {

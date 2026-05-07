@@ -2,9 +2,9 @@ package edu.cit.bayonas.citmedconnect.mapper;
 
 import edu.cit.bayonas.citmedconnect.dto.MedicalRecordDTO;
 import edu.cit.bayonas.citmedconnect.entity.MedicalRecordEntity;
-import edu.cit.bayonas.citmedconnect.entity.UserEntity;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
 import edu.cit.bayonas.citmedconnect.entity.AppointmentEntity;
-import edu.cit.bayonas.citmedconnect.repository.UserRepository;
+import edu.cit.bayonas.citmedconnect.features.auth.repository.UserRepository;
 import edu.cit.bayonas.citmedconnect.repository.AppointmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

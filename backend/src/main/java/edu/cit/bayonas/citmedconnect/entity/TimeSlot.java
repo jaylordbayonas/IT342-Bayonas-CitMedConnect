@@ -3,6 +3,7 @@ package edu.cit.bayonas.citmedconnect.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
 
 @Entity
 @Table(name = "time_slots")

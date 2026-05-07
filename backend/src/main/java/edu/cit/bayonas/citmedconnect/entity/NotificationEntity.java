@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
 
 @Entity
 @Table(name = "notification")

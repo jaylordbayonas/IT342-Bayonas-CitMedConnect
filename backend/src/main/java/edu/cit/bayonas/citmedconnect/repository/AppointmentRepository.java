@@ -1,7 +1,7 @@
 package edu.cit.bayonas.citmedconnect.repository;
 
 import edu.cit.bayonas.citmedconnect.entity.AppointmentEntity;
-import edu.cit.bayonas.citmedconnect.entity.UserEntity;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
 import edu.cit.bayonas.citmedconnect.entity.TimeSlot;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

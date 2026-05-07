@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.cit.bayonas.citmedconnect.dto.GitHubOAuth2UserInfo;
 import edu.cit.bayonas.citmedconnect.dto.OAuth2AuthResponse;
 import edu.cit.bayonas.citmedconnect.dto.UserDTO;
-import edu.cit.bayonas.citmedconnect.entity.UserEntity;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
 import edu.cit.bayonas.citmedconnect.service.OAuth2Service;
 
 @RestController

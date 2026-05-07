@@ -2,8 +2,8 @@ package edu.cit.bayonas.citmedconnect.controller;
 
 import edu.cit.bayonas.citmedconnect.entity.TimeSlot;
 import edu.cit.bayonas.citmedconnect.entity.AppointmentEntity;
-import edu.cit.bayonas.citmedconnect.entity.UserEntity;
-import edu.cit.bayonas.citmedconnect.repository.UserRepository;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
+import edu.cit.bayonas.citmedconnect.features.auth.repository.UserRepository;
 import edu.cit.bayonas.citmedconnect.service.TimeSlotService;
 import edu.cit.bayonas.citmedconnect.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;

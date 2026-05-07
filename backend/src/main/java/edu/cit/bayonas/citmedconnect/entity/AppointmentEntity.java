@@ -2,6 +2,7 @@ package edu.cit.bayonas.citmedconnect.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
 
 @Entity
 @Table(name = "appointments")
