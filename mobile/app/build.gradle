@@ -73,6 +73,26 @@ dependencies {
     
     // Testing
     testImplementation 'junit:junit:4.13.2'
+    
+    // Mockito for Java mocking
+    testImplementation 'org.mockito:mockito-core:5.8.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.8.0'
+    
+    // Mockk for Kotlin mocking
+    testImplementation 'io.mockk:mockk:1.13.8'
+    
+    // Robolectric for unit tests with Android framework
+    testImplementation 'org.robolectric:robolectric:4.11.1'
+    
+    // AndroidX Test - Instrumentation tests
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    
+    // Mockito for Android instrumentation tests
+    androidTestImplementation 'org.mockito.android:mockito-android:5.1.0'
+    
+    // Hamcrest matchers for assertions
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    androidTestImplementation 'org.hamcrest:hamcrest:2.2'
 }
