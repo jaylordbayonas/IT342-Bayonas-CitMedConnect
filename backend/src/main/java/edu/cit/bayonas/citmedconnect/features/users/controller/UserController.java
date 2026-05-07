@@ -1,4 +1,4 @@
-package edu.cit.bayonas.citmedconnect.controller;
+package edu.cit.bayonas.citmedconnect.features.users.controller;
 
 import java.util.List;
 import java.util.Map;
