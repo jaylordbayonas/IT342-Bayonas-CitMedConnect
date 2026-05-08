@@ -14,4 +14,6 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
     UserEntity findBySchoolId(String schoolId);
     List<UserEntity> findByRole(String role);
     UserEntity findByOauthProviderAndOauthId(String oauthProvider, String oauthId);
+    List<UserEntity> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+        String firstName, String lastName, String email);
 }

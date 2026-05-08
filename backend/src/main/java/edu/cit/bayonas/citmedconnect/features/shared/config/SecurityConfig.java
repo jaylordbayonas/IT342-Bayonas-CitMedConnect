@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,6 +26,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Profile("!test")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
@@ -35,6 +37,18 @@ public class SecurityConfig {
                 .requestMatchers("/api/appointments/test").permitAll()
                 .requestMatchers("/api/appointments/simple").permitAll()
                 .requestMatchers("/api/appointments/").permitAll()
+                .anyRequest().permitAll()
+            );
+        return http.build();
+    }
+
+    @Bean
+    @Profile("test")
+    public SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll()
             );
         return http.build();

@@ -2,7 +2,7 @@ package edu.cit.bayonas.citmedconnect.features.auth.mapper;
 
 import org.springframework.stereotype.Component;
 
-import edu.cit.bayonas.citmedconnect.dto.UserDTO;
+import edu.cit.bayonas.citmedconnect.features.auth.dto.UserDTO;
 import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
 
 @Component

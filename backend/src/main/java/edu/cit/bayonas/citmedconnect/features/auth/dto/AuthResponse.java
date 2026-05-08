@@ -58,13 +58,15 @@ public class AuthResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class UserData {
         private String id;
+        private String schoolId;
         private String name;
         private String email;
 
         public UserData() {}
 
-        public UserData(String id, String name, String email) {
-            this.id = id;
+        public UserData(String schoolId, String name, String email) {
+            this.id = schoolId; // Keep for backward compatibility
+            this.schoolId = schoolId; // Add explicit schoolId field
             this.name = name;
             this.email = email;
         }
@@ -75,6 +77,16 @@ public class AuthResponse {
 
         public void setId(String id) {
             this.id = id;
+            this.schoolId = id; // Keep both fields in sync
+        }
+
+        public String getSchoolId() {
+            return schoolId;
+        }
+
+        public void setSchoolId(String schoolId) {
+            this.schoolId = schoolId;
+            this.id = schoolId; // Keep both fields in sync
         }
 
         public String getName() {

@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import edu.cit.bayonas.citmedconnect.dto.UserDTO;
+import edu.cit.bayonas.citmedconnect.features.auth.dto.UserDTO;
 import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
 import edu.cit.bayonas.citmedconnect.features.auth.mapper.UserMapper;
 import edu.cit.bayonas.citmedconnect.features.auth.repository.UserRepository;
@@ -108,5 +108,72 @@ public class UserService {
         }
 
         return mapper.toDTO(entity);
+    }
+
+    // Additional user management methods
+    public List<UserDTO> getUsersByRole(String role) {
+        List<UserEntity> entities = userRepository.findByRole(role);
+        return entities.stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public UserDTO changePassword(String schoolId, String currentPassword, String newPassword) {
+        UserEntity entity = userRepository.findBySchoolId(schoolId);
+        if (entity == null) {
+            throw new RuntimeException("User not found with school_id: " + schoolId);
+        }
+
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, entity.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        // Update password
+        entity.setPassword(passwordEncoder.encode(newPassword));
+        UserEntity updatedEntity = userRepository.save(entity);
+        
+        return mapper.toDTO(updatedEntity);
+    }
+
+    public UserDTO updateUserRole(String schoolId, String newRole) {
+        UserEntity entity = userRepository.findBySchoolId(schoolId);
+        if (entity == null) {
+            throw new RuntimeException("User not found with school_id: " + schoolId);
+        }
+        
+        entity.setRole(newRole);
+        UserEntity updatedEntity = userRepository.save(entity);
+        return mapper.toDTO(updatedEntity);
+    }
+
+    public long getUserCount() {
+        return userRepository.count();
+    }
+
+    public long getUserCountByRole(String role) {
+        List<UserEntity> users = userRepository.findByRole(role);
+        return users != null ? users.size() : 0;
+    }
+
+    public List<UserDTO> searchUsers(String searchTerm) {
+        List<UserEntity> entities = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+            searchTerm, searchTerm, searchTerm);
+        return entities.stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public boolean userExists(String schoolId) {
+        return userRepository.findBySchoolId(schoolId) != null;
+    }
+
+    public boolean deleteUserBySchoolId(String schoolId) {
+        UserEntity entity = userRepository.findBySchoolId(schoolId);
+        if (entity != null) {
+            userRepository.delete(entity);
+            return true;
+        }
+        return false;
     }
 }
