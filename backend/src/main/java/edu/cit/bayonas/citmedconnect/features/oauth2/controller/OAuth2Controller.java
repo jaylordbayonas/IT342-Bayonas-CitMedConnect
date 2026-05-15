@@ -1,0 +1,213 @@
+package edu.cit.bayonas.citmedconnect.features.oauth2.controller;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import edu.cit.bayonas.citmedconnect.features.oauth2.dto.CodeExchangeRequest;
+import edu.cit.bayonas.citmedconnect.features.oauth2.dto.GitHubOAuth2CallbackRequest;
+import edu.cit.bayonas.citmedconnect.features.oauth2.dto.GitHubOAuth2UserInfo;
+import edu.cit.bayonas.citmedconnect.features.oauth2.dto.OAuth2AuthResponse;
+import edu.cit.bayonas.citmedconnect.features.oauth2.service.OAuth2Service;
+import edu.cit.bayonas.citmedconnect.features.auth.dto.UserDTO;
+import edu.cit.bayonas.citmedconnect.features.auth.entity.UserEntity;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/api/auth/oauth2")
+@CrossOrigin(origins = "*")
+public class OAuth2Controller {
+
+    @Autowired
+    private OAuth2Service oAuth2Service;
+
+    @Value("${spring.security.oauth2.client.registration.github.client-id}")
+    private String githubClientId;
+
+    @Value("${spring.security.oauth2.client.registration.github.client-secret}")
+    private String githubClientSecret;
+
+    // Test endpoint
+    @GetMapping("/test")
+    public ResponseEntity<Map<String, String>> test() {
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "OAuth2 Controller is working!");
+        response.put("feature", "oauth2");
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Handle GitHub OAuth2 callback
+     * POST /api/auth/oauth2/github/callback
+     * 
+     * Expects: { "accessToken": "github_access_token" }
+     */
+    @PostMapping("/github/callback")
+    public ResponseEntity<OAuth2AuthResponse> handleGitHubCallback(
+            @Valid @RequestBody GitHubOAuth2CallbackRequest request, 
+            BindingResult bindingResult) {
+        try {
+            System.out.println("=== GitHub OAuth2 Callback ===");
+            System.out.println("Request: " + request);
+            
+            // Check for validation errors
+            if (bindingResult.hasErrors()) {
+                String errors = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.joining(", "));
+                return ResponseEntity.badRequest()
+                    .body(new OAuth2AuthResponse(false, "Validation error: " + errors));
+            }
+
+            // Get user info from GitHub
+            GitHubOAuth2UserInfo gitHubUser = oAuth2Service.getGitHubUserInfo(request.getAccessToken());
+
+            if (gitHubUser == null || gitHubUser.getId() == null) {
+                return ResponseEntity.badRequest()
+                    .body(new OAuth2AuthResponse(false, "Failed to retrieve GitHub user information"));
+            }
+
+            // Process OAuth2 user - create or update
+            UserEntity user = oAuth2Service.processGitHubOAuth2(gitHubUser);
+            UserDTO userDTO = oAuth2Service.convertToUserDTO(user);
+
+            // Generate token
+            String token = oAuth2Service.generateSimpleToken();
+
+            // Determine if this is a new user (profile incomplete)
+            boolean isNewUser = oAuth2Service.isProfileIncomplete(user);
+
+            System.out.println("OAuth2 login successful for user: " + user.getSchoolId() + ", isNewUser: " + isNewUser);
+
+            return ResponseEntity.ok()
+                .body(new OAuth2AuthResponse(true, "GitHub login successful", userDTO, token, isNewUser));
+
+        } catch (RuntimeException e) {
+            System.err.println("GitHub authentication failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new OAuth2AuthResponse(false, "GitHub authentication failed: " + e.getMessage()));
+        } catch (Exception e) {
+            System.err.println("Unexpected error during GitHub authentication: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new OAuth2AuthResponse(false, "An unexpected error occurred: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Exchange GitHub authorization code for access token
+     * POST /api/auth/oauth2/github/exchange-code
+     *
+     * Expects: { "code": "github_authorization_code", "redirectUri": "optional_redirect_uri" }
+     * Returns: { "accessToken": "github_access_token" }
+     */
+    @PostMapping("/github/exchange-code")
+    public ResponseEntity<Map<String, String>> exchangeCodeForToken(
+            @Valid @RequestBody CodeExchangeRequest request, 
+            BindingResult bindingResult) {
+        try {
+            System.out.println("=== GitHub Code Exchange ===");
+            System.out.println("Request: " + request);
+            
+            // Check for validation errors
+            if (bindingResult.hasErrors()) {
+                String errors = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.joining(", "));
+                return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Validation error: " + errors));
+            }
+
+            RestClient restClient = RestClient.create();
+            MultiValueMap<String, String> payload = new LinkedMultiValueMap<>();
+            payload.add("client_id", githubClientId);
+            payload.add("client_secret", githubClientSecret);
+            payload.add("code", request.getCode());
+            
+            if (request.getRedirectUri() != null && !request.getRedirectUri().isBlank()) {
+                payload.add("redirect_uri", request.getRedirectUri());
+            }
+
+            System.out.println("Exchanging code with GitHub...");
+            String response = restClient.post()
+                .uri("https://github.com/login/oauth/access_token")
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(payload)
+                .retrieve()
+                .body(String.class);
+
+            JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
+
+            if (jsonResponse.has("error")) {
+                String error = jsonResponse.get("error").getAsString();
+                System.err.println("GitHub OAuth error: " + error);
+                return ResponseEntity.badRequest()
+                    .body(Map.of("error", error));
+            }
+
+            String accessToken = jsonResponse.get("access_token").getAsString();
+            System.out.println("Successfully exchanged code for access token");
+            return ResponseEntity.ok(Map.of("accessToken", accessToken));
+
+        } catch (RestClientResponseException e) {
+            System.err.println("GitHub API error: " + e.getMessage());
+            String responseBody = e.getResponseBodyAsString();
+            try {
+                JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
+                if (jsonResponse.has("error_description")) {
+                    return ResponseEntity.badRequest()
+                        .body(Map.of("error", jsonResponse.get("error_description").getAsString()));
+                }
+                if (jsonResponse.has("error")) {
+                    return ResponseEntity.badRequest()
+                        .body(Map.of("error", jsonResponse.get("error").getAsString()));
+                }
+            } catch (Exception ignored) {
+                // Fall through to generic response below
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "GitHub API error: " + e.getMessage()));
+        } catch (Exception e) {
+            System.err.println("Unexpected error during code exchange: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Failed to exchange code: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Get OAuth2 configuration info
+     * GET /api/auth/oauth2/config
+     */
+    @GetMapping("/config")
+    public ResponseEntity<Map<String, String>> getOAuth2Config() {
+        Map<String, String> config = new HashMap<>();
+        config.put("githubClientId", githubClientId);
+        config.put("githubAuthUrl", "https://github.com/login/oauth/authorize");
+        return ResponseEntity.ok(config);
+    }
+}
