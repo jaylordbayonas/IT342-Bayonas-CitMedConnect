@@ -41,8 +41,16 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         try {
-            // Validate input
-            if (request.getName() == null || request.getName().trim().isEmpty()) {
+            // Resolve first/last name — prefer explicit fields, fall back to splitting "name"
+            String firstName = request.getFirstName();
+            String lastName  = request.getLastName();
+            if ((firstName == null || firstName.isBlank()) && request.getName() != null) {
+                String[] parts = request.getName().trim().split(" ", 2);
+                firstName = parts[0];
+                lastName  = parts.length > 1 ? parts[1] : "";
+            }
+
+            if (firstName == null || firstName.trim().isEmpty()) {
                 return ResponseEntity.badRequest()
                     .body(new AuthResponse(false, "Name is required"));
             }
@@ -55,41 +63,42 @@ public class AuthController {
                     .body(new AuthResponse(false, "Password must be at least 6 characters"));
             }
 
-            // Check if email already exists
             if (userService.existsByEmail(request.getEmail())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new AuthResponse(false, "Email already registered"));
             }
 
-            // Create new user
             UserDTO userDTO = new UserDTO();
-            
-            // Split name into first and last name
-            String[] nameParts = request.getName().trim().split(" ", 2);
-            userDTO.setFirstName(nameParts[0]);
-            userDTO.setLastName(nameParts.length > 1 ? nameParts[1] : "");
-            
-            userDTO.setEmail(request.getEmail());
+            userDTO.setFirstName(firstName.trim());
+            userDTO.setLastName(lastName != null ? lastName.trim() : "");
+            userDTO.setEmail(request.getEmail().trim());
             userDTO.setPassword(request.getPassword());
-            userDTO.setSchoolId(UUID.randomUUID().toString()); // Generate unique ID
-            
-            // Set defaults for required fields
-            userDTO.setPhone(""); // Can be updated later by user
-            userDTO.setRole("STUDENT"); // Default role
-            userDTO.setGender("OTHER"); // Can be updated later by user
-            userDTO.setAge(0); // Can be updated later by user
-            
+
+            // Use provided schoolId or generate one
+            String schoolId = (request.getSchoolId() != null && !request.getSchoolId().isBlank())
+                ? request.getSchoolId().trim()
+                : UUID.randomUUID().toString();
+            userDTO.setSchoolId(schoolId);
+
+            userDTO.setPhone(request.getPhone() != null ? request.getPhone().trim() : "");
+            userDTO.setRole(request.getRole() != null && !request.getRole().isBlank()
+                ? request.getRole().trim().toUpperCase() : "STUDENT");
+            userDTO.setGender(request.getGender() != null && !request.getGender().isBlank()
+                ? request.getGender().trim() : "OTHER");
+            userDTO.setAge(request.getAge() > 0 ? request.getAge() : 0);
+
             UserDTO createdUser = userService.createUser(userDTO);
 
-            // Prepare response
             UserData userData = new UserData(
                 createdUser.getSchoolId(),
-                createdUser.getFirstName() + " " + createdUser.getLastName(),
-                createdUser.getEmail()
+                createdUser.getFirstName(),
+                createdUser.getLastName(),
+                createdUser.getEmail(),
+                createdUser.getRole()
             );
-            
+
             String token = generateSimpleToken();
-            
+
             return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new AuthResponse(true, "Registration successful", token, userData));
 
@@ -130,10 +139,12 @@ public class AuthController {
             // Prepare response
             UserData userData = new UserData(
                 authenticatedUser.getSchoolId(),
-                authenticatedUser.getFirstName() + " " + authenticatedUser.getLastName(),
-                authenticatedUser.getEmail()
+                authenticatedUser.getFirstName(),
+                authenticatedUser.getLastName(),
+                authenticatedUser.getEmail(),
+                authenticatedUser.getRole()
             );
-            
+
             String token = generateSimpleToken();
 
             return ResponseEntity.ok()

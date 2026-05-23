@@ -10,7 +10,7 @@ public class MedicalRecordDTO {
     private Long recordId;
     
     @NotBlank(message = "User ID is required")
-    @Size(max = 20, message = "User ID must not exceed 20 characters")
+    @Size(max = 100, message = "User ID must not exceed 100 characters")
     private String userId;  // This is schoolId
     
     private String userName;

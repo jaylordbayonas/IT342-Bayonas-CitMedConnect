@@ -3,89 +3,122 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 const getAuthHeaders = () => {
-  const headers = {
-    'Content-Type': 'application/json'
-  };
-  
+  const headers = { 'Content-Type': 'application/json' };
   const token = localStorage.getItem('token');
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  
+  if (token) headers['Authorization'] = `Bearer ${token}`;
   return headers;
 };
 
 export const notificationService = {
-  // Fetch user notifications
   fetchUserNotifications: async (schoolId, userRole) => {
-    const response = await axios.get(
-      `${API_URL}/notifications/user/${schoolId}/role/${userRole}`,
-      { headers: getAuthHeaders() }
-    );
-    return response.data;
+    try {
+      const response = await axios.get(
+        `${API_URL}/notifications/user/${encodeURIComponent(schoolId)}/role/${encodeURIComponent(userRole)}`,
+        { headers: getAuthHeaders() }
+      );
+      return { success: true, data: Array.isArray(response.data) ? response.data : [] };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'Failed to fetch notifications',
+        data: []
+      };
+    }
   },
 
-  // Mark notification as read
   markAsRead: async (notificationId) => {
-    const response = await axios.put(
-      `${API_URL}/notifications/${notificationId}/read`,
-      {},
-      { headers: getAuthHeaders() }
-    );
-    return response.data;
+    try {
+      const response = await axios.put(
+        `${API_URL}/notifications/${notificationId}/read`,
+        {},
+        { headers: getAuthHeaders() }
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'Failed to mark as read'
+      };
+    }
   },
 
-  // Delete notification
   deleteNotification: async (notificationId) => {
-    await axios.delete(
-      `${API_URL}/notifications/${notificationId}`,
-      { headers: getAuthHeaders() }
-    );
+    try {
+      await axios.delete(
+        `${API_URL}/notifications/${notificationId}`,
+        { headers: getAuthHeaders() }
+      );
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'Failed to delete notification'
+      };
+    }
   },
 
-  // Send notification to all students (Staff only)
-  sendNotificationToAllStudents: async (title, message, type = 'info') => {
-    const response = await axios.post(
-      `${API_URL}/notifications/broadcast/students`,
-      { title, message },
-      { headers: getAuthHeaders() }
-    );
-    return response.data;
+  sendNotificationToAllStudents: async (title, message) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/notifications/broadcast/students`,
+        { title, message },
+        { headers: getAuthHeaders() }
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'Failed to send notification to students'
+      };
+    }
   },
 
-  // Send notification to everyone (Staff only)
-  sendNotificationToEveryone: async (title, message, type = 'info') => {
-    const response = await axios.post(
-      `${API_URL}/notifications/broadcast/all`,
-      { title, message },
-      { headers: getAuthHeaders() }
-    );
-    return response.data;
+  sendNotificationToEveryone: async (title, message) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/notifications/broadcast/all`,
+        { title, message },
+        { headers: getAuthHeaders() }
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'Failed to send notification to everyone'
+      };
+    }
   },
 
-  // Send notification to a specific user
   sendNotificationToUser: async (schoolId, title, message, type = 'info') => {
-    const response = await axios.post(
-      `${API_URL}/notifications/send`,
-      { 
-        recipientId: schoolId,
-        title, 
-        message,
-        type 
-      },
-      { headers: getAuthHeaders() }
-    );
-    return response.data;
+    try {
+      const response = await axios.post(
+        `${API_URL}/notifications/send`,
+        { recipientId: schoolId, title, message, type },
+        { headers: getAuthHeaders() }
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'Failed to send notification'
+      };
+    }
   },
 
-  // Send notification to all staff members
-  sendNotificationToAllStaff: async (title, message, type = 'info') => {
-    const response = await axios.post(
-      `${API_URL}/notifications/broadcast/staff`,
-      { title, message, type },
-      { headers: getAuthHeaders() }
-    );
-    return response.data;
+  sendNotificationToAllStaff: async (title, message) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/notifications/broadcast/staff`,
+        { title, message },
+        { headers: getAuthHeaders() }
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'Failed to send notification to staff'
+      };
+    }
   }
 };
 

@@ -218,16 +218,24 @@ export const AuthProvider = ({ children }) => {
       const loginResult = await userService.login(email, password);
       
       if (loginResult.success && loginResult.data) {
-        // Login successful - support both {user: ...} and plain user payloads
+        // Login successful - extract user from AuthResponse { success, message, token, user }
         const foundUser = loginResult.data.user || loginResult.data;
-        
+
         // Set session expiry
         const expiryDuration = rememberMe ? 24 * 60 * 60 * 1000 : 2 * 60 * 60 * 1000;
         const expiry = new Date(Date.now() + expiryDuration);
-        
+
+        // Split name into parts if firstName/lastName are not individually provided
+        const nameParts = (foundUser.name || '').trim().split(' ');
+        const derivedFirstName = foundUser.firstName || nameParts[0] || '';
+        const derivedLastName = foundUser.lastName || nameParts.slice(1).join(' ') || '';
+
         // Create the user object with all required fields
         const userToSave = {
           ...normalizeUser(foundUser),
+          firstName: derivedFirstName,
+          lastName: derivedLastName,
+          role: (foundUser.role || 'student').toLowerCase(),
           isAuthenticated: true
         };
         
@@ -247,8 +255,7 @@ export const AuthProvider = ({ children }) => {
         
         return { success: true, user: userToSave };
       } else {
-        // User doesn't exist - don't auto-create, require registration
-        throw new Error('User not found. Please register first or check your credentials.');
+        throw new Error(loginResult.error || 'Invalid email or password.');
       }
       
     } catch (err) {
@@ -538,14 +545,17 @@ export const AuthProvider = ({ children }) => {
       };
       
       const createResult = await userService.createUser(newUser);
-      
+
       if (!createResult.success) {
         throw new Error(createResult.error || 'Failed to register user');
       }
-      
-      await createAuditLog('CREATE', 'user', createResult.data.schoolId || createResult.data.userId, { email, schoolId });
-      
-      return { success: true, user: createResult.data };
+
+      // Backend returns AuthResponse: { success, message, token, user: { schoolId, ... } }
+      const createdUser = createResult.data?.user || createResult.data;
+
+      await createAuditLog('CREATE', 'user', createdUser?.schoolId || createdUser?.userId, { email, schoolId });
+
+      return { success: true, user: createdUser };
       
     } catch (err) {
       throw new Error(err.message || 'Registration failed');

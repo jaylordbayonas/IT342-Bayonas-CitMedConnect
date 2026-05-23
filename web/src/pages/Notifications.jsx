@@ -58,12 +58,14 @@ const Notifications = () => {
   }, [location.state, isStaff]);
 
   const getNotificationIcon = useCallback((type) => {
-    switch (type) {
+    switch ((type || '').toLowerCase()) {
       case 'success':
+      case 'medical_record':
         return CheckCircle;
       case 'warning':
         return AlertCircle;
       case 'info':
+      case 'appointment':
         return Info;
       default:
         return Bell;
@@ -71,12 +73,14 @@ const Notifications = () => {
   }, []);
 
   const getNotificationColor = useCallback((type) => {
-    switch (type) {
+    switch ((type || '').toLowerCase()) {
       case 'success':
+      case 'medical_record':
         return '#4CAF50';
       case 'warning':
         return '#FFC107';
       case 'info':
+      case 'appointment':
         return '#2196F3';
       default:
         return '#9E9E9E';

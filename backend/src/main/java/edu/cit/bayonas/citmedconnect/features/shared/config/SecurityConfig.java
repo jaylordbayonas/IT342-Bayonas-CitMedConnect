@@ -32,11 +32,6 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/appointments/staff/**").hasRole("Staff")
-                .requestMatchers("/api/appointments/student/**").hasRole("Student")
-                .requestMatchers("/api/appointments/test").permitAll()
-                .requestMatchers("/api/appointments/simple").permitAll()
-                .requestMatchers("/api/appointments/").permitAll()
                 .anyRequest().permitAll()
             );
         return http.build();
