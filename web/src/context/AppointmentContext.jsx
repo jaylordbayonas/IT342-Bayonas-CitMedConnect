@@ -104,20 +104,9 @@ export const AppointmentProvider = ({ children }) => {
           try {
             appointmentsData = await appointmentService.getStudentAppointments();
             console.log('Student appointments data:', appointmentsData);
-            console.log('Student appointments length:', appointmentsData?.length || 0);
-            if (!appointmentsData || appointmentsData.length === 0) {
-              console.log('No appointments from student endpoint, trying fallback...');
-              // Fallback to user appointments endpoint
-              appointmentsData = await appointmentService.getUserAppointments(actualUserId);
-              console.log('User appointments data (fallback):', appointmentsData);
-              console.log('User appointments length (fallback):', appointmentsData?.length || 0);
-            }
           } catch (studentError) {
-            console.log('Student endpoint failed, trying user appointments:', studentError);
-            // Fallback to user appointments endpoint
-            appointmentsData = await appointmentService.getUserAppointments(actualUserId);
-            console.log('User appointments data (fallback):', appointmentsData);
-            console.log('User appointments length (fallback):', appointmentsData?.length || 0);
+            console.log('Student endpoint failed:', studentError);
+            appointmentsData = [];
           }
         } else {
           console.log('Loading appointments for user:', actualUserId);
@@ -194,11 +183,9 @@ export const AppointmentProvider = ({ children }) => {
   // Get user's appointments
   const userAppointments = useMemo(() => {
     if (!user) return [];
-    // Appointments are already filtered by role from the API
-    console.log('userAppointments memo - user:', user);
-    console.log('userAppointments memo - appointments count:', appointments.length);
-    console.log('userAppointments memo - returning all appointments:', appointments);
-    return appointments;
+    if (isStaffOrAdmin(user?.role)) return appointments;
+    const currentStudentId = user.userId || user.schoolId;
+    return appointments.filter(apt => apt.studentId === currentStudentId);
   }, [appointments, user]);
   
   // Get upcoming appointments
@@ -293,8 +280,12 @@ export const AppointmentProvider = ({ children }) => {
             }
           }
           const transformedAppointments = appointmentsData.map(apt => transformAppointment(apt));
-          console.log('Refreshed appointments:', transformedAppointments);
-          setAppointments(transformedAppointments);
+          // Only replace state if the server returned data. An empty response likely
+          // means the auth header wasn't accepted for that request — keep the
+          // optimistic update so the newly booked appointment stays visible.
+          if (transformedAppointments.length > 0) {
+            setAppointments(transformedAppointments);
+          }
         } catch (refreshError) {
           console.error('Failed to refresh appointments:', refreshError);
         }

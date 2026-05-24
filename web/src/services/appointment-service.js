@@ -5,8 +5,7 @@
 
 import { API_BASE_URL, API_ENDPOINTS } from './api-endpoints';
 import { getUserId, getUserRole, getAuthHeaders } from './auth-helper';
-import { transformAppointment, transformTimeSlot } from './data-transformer';
-import { notificationService } from './notificationService';
+import { transformTimeSlot } from './data-transformer';
 
 /**
  * APPOINTMENT SERVICE CLASS
@@ -121,21 +120,7 @@ class AppointmentService {
             
             const result = await response.json();
             console.log('Booking success response:', result);
-            
-            // Send notification to all staff members after successful booking
-            try {
-                const studentId = bookingData.studentId || userId;
-                await notificationService.sendNotificationToAllStaff(
-                    'New Appointment Booked',
-                    `Student ${studentId} has booked a new appointment. Reason: ${bookingData.reason}`,
-                    'info'
-                );
-                console.log('Notification sent successfully to all staff members');
-            } catch (notificationError) {
-                console.error('Failed to send notification to staff:', notificationError);
-                // Don't fail the whole operation if notification fails
-            }
-            
+
             return result;
         } catch (error) {
             console.error('Error booking appointment:', error);
@@ -162,10 +147,7 @@ class AppointmentService {
 
             const appointments = await response.json();
             console.log('Raw appointments from API:', appointments);
-            // Transform appointments for frontend compatibility
-            const transformed = appointments.map(apt => transformAppointment(apt));
-            console.log('Transformed appointments:', transformed);
-            return transformed;
+            return appointments;
         } catch (error) {
             console.error('Error fetching student appointments:', error);
             throw error;
@@ -178,7 +160,7 @@ class AppointmentService {
             console.log('Fetching appointments for user:', userId);
             const url = `${API_BASE_URL}${API_ENDPOINTS.USER_APPOINTMENTS(userId)}`;
             console.log('URL:', url);
-            
+
             const response = await fetch(url, {
                 method: 'GET',
                 headers: this.baseHeaders
@@ -191,10 +173,7 @@ class AppointmentService {
 
             const appointments = await response.json();
             console.log('Raw appointments from API:', appointments);
-            // Transform appointments for frontend compatibility
-            const transformed = appointments.map(apt => transformAppointment(apt));
-            console.log('Transformed appointments:', transformed);
-            return transformed;
+            return appointments;
         } catch (error) {
             console.error('Error fetching user appointments:', error);
             throw error;
@@ -274,21 +253,7 @@ class AppointmentService {
             const appointments = await response.json();
             console.log('Raw appointments from API:', appointments);
             console.log('Number of appointments:', appointments.length);
-            
-            // Log first appointment details if available
-            if (appointments.length > 0) {
-                console.log('First appointment sample:', appointments[0]);
-                console.log('First appointment keys:', Object.keys(appointments[0]));
-            }
-            
-            // Transform appointments for frontend compatibility
-            const transformed = appointments.map(apt => {
-                const result = transformAppointment(apt);
-                console.log('Transformed appointment:', result);
-                return result;
-            });
-            console.log('All transformed appointments:', transformed);
-            return transformed;
+            return appointments;
         } catch (error) {
             console.error('Error fetching all appointments:', error);
             throw error;

@@ -1,21 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import useAuth from './useAuth';
-
-const STORAGE_KEY = 'citmedconnect_medical_records';
-
-const loadStoredRecords = () => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveStoredRecords = (records) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-};
+import { medicalRecordsService } from '../services/medicalRecordsService';
 
 const normalizeVitalSigns = (vitalSigns) => {
   if (!vitalSigns) return null;
@@ -44,7 +29,6 @@ const normalizeRecord = (item, index = 0) => ({
   createdAt: item.createdAt || new Date().toISOString(),
   updatedAt: item.updatedAt || new Date().toISOString(),
   createdBy: item.createdBy || item.staffId || null,
-  ...item,
 });
 
 const parsePrescriptionCount = (record) => {
@@ -56,7 +40,11 @@ const parsePrescriptionCount = (record) => {
     .filter(Boolean).length;
 };
 
-const normalizeStoredRecords = (records) => records.map((item, index) => normalizeRecord(item, index));
+const toVitalSignsString = (vitalSigns) => {
+  if (!vitalSigns) return '{}';
+  if (typeof vitalSigns === 'string') return vitalSigns;
+  return JSON.stringify(vitalSigns);
+};
 
 const useMedicalRecords = () => {
   const { user, isStaff } = useAuth();
@@ -71,12 +59,26 @@ const useMedicalRecords = () => {
     setError(null);
 
     try {
-      const storedRecords = normalizeStoredRecords(loadStoredRecords());
-      const visibleRecords = isStaff
-        ? storedRecords
-        : storedRecords.filter((record) => !currentUserId || record.userId === currentUserId);
+      let result;
+      if (isStaff) {
+        result = await medicalRecordsService.getAllMedicalRecords();
+      } else if (currentUserId) {
+        result = await medicalRecordsService.getMedicalRecordsByUserId(currentUserId);
+      } else {
+        setRecords([]);
+        setLoading(false);
+        return;
+      }
 
-      setRecords(visibleRecords);
+      if (result.success) {
+        const normalized = (Array.isArray(result.data) ? result.data : []).map((item, i) =>
+          normalizeRecord(item, i)
+        );
+        setRecords(normalized);
+      } else {
+        setError(result.error || 'Unable to load medical records.');
+        setRecords([]);
+      }
     } catch {
       setError('Unable to load medical records.');
       setRecords([]);
@@ -95,33 +97,29 @@ const useMedicalRecords = () => {
     }
 
     try {
-      const nextRecord = normalizeRecord({
-        recordId: `record-${Date.now()}`,
+      const payload = {
         userId: recordData.studentId || recordData.userId,
-        userName: recordData.studentName || recordData.userName || recordData.studentId || 'Student',
         appointmentId: recordData.appointmentId || null,
         diagnosis: recordData.diagnosis,
         symptoms: recordData.symptoms || '',
         treatment: recordData.treatment || '',
-        prescription: recordData.prescriptions || '',
-        vitalSigns: recordData.vitalSigns || null,
+        prescription: recordData.prescriptions || recordData.prescription || '',
+        vitalSigns: toVitalSignsString(recordData.vitalSigns),
         allergies: recordData.allergies || '',
         medicalHistory: recordData.medicalHistory || '',
         notes: recordData.notes || '',
         createdBy: currentUserId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+      };
 
-      const storedRecords = [nextRecord, ...normalizeStoredRecords(loadStoredRecords())];
-      saveStoredRecords(storedRecords);
-      setRecords(isStaff ? storedRecords : storedRecords.filter((record) => !currentUserId || record.userId === currentUserId));
-
-      return { success: true, data: nextRecord, message: 'Record created successfully.' };
+      const result = await medicalRecordsService.createMedicalRecord(payload);
+      if (result.success) {
+        await fetchMedicalRecords();
+      }
+      return result;
     } catch {
       return { success: false, error: 'Failed to create record.' };
     }
-  }, [currentUserId, isStaff]);
+  }, [currentUserId, isStaff, fetchMedicalRecords]);
 
   const updateRecord = useCallback(async (recordId, recordData) => {
     if (!isStaff) {
@@ -129,34 +127,28 @@ const useMedicalRecords = () => {
     }
 
     try {
-      const updatedRecords = normalizeStoredRecords(loadStoredRecords()).map((record) => {
-        if (record.recordId !== recordId) return record;
+      const payload = {
+        userId: recordData.studentId || recordData.userId,
+        appointmentId: recordData.appointmentId ?? null,
+        diagnosis: recordData.diagnosis,
+        symptoms: recordData.symptoms ?? '',
+        treatment: recordData.treatment ?? '',
+        prescription: recordData.prescriptions ?? recordData.prescription ?? '',
+        vitalSigns: toVitalSignsString(recordData.vitalSigns),
+        allergies: recordData.allergies ?? '',
+        medicalHistory: recordData.medicalHistory ?? '',
+        notes: recordData.notes ?? '',
+      };
 
-        return {
-          ...record,
-          userId: recordData.studentId || recordData.userId || record.userId,
-          appointmentId: recordData.appointmentId ?? record.appointmentId,
-          diagnosis: recordData.diagnosis ?? record.diagnosis,
-          symptoms: recordData.symptoms ?? record.symptoms,
-          treatment: recordData.treatment ?? record.treatment,
-          prescription: recordData.prescriptions ?? record.prescription,
-          vitalSigns: recordData.vitalSigns ?? record.vitalSigns,
-          allergies: recordData.allergies ?? record.allergies,
-          medicalHistory: recordData.medicalHistory ?? record.medicalHistory,
-          notes: recordData.notes ?? record.notes,
-          updatedAt: new Date().toISOString(),
-        };
-      });
-
-      saveStoredRecords(updatedRecords);
-      setRecords(isStaff ? updatedRecords : updatedRecords.filter((record) => !currentUserId || record.userId === currentUserId));
-
-      const updatedRecord = updatedRecords.find((record) => record.recordId === recordId);
-      return { success: true, data: updatedRecord, message: 'Record updated successfully.' };
+      const result = await medicalRecordsService.updateMedicalRecord(recordId, payload);
+      if (result.success) {
+        await fetchMedicalRecords();
+      }
+      return result;
     } catch {
       return { success: false, error: 'Failed to update record.' };
     }
-  }, [currentUserId, isStaff]);
+  }, [isStaff, fetchMedicalRecords]);
 
   const deleteRecord = useCallback(async (recordId) => {
     if (!isStaff) {
@@ -164,18 +156,22 @@ const useMedicalRecords = () => {
     }
 
     try {
-      const updatedRecords = normalizeStoredRecords(loadStoredRecords()).filter((record) => record.recordId !== recordId);
-      saveStoredRecords(updatedRecords);
-      setRecords(isStaff ? updatedRecords : updatedRecords.filter((record) => !currentUserId || record.userId === currentUserId));
-      return { success: true, message: 'Record deleted successfully.' };
+      const result = await medicalRecordsService.deleteMedicalRecord(recordId);
+      if (result.success) {
+        await fetchMedicalRecords();
+      }
+      return result;
     } catch {
       return { success: false, error: 'Failed to delete record.' };
     }
-  }, [currentUserId, isStaff]);
+  }, [isStaff, fetchMedicalRecords]);
 
   const latestVitalSigns = useMemo(() => {
     if (!records.length) return null;
-    const latest = [...records].sort((left, right) => new Date(right.recordDate || right.createdAt) - new Date(left.recordDate || left.createdAt))[0];
+    const latest = [...records].sort(
+      (left, right) =>
+        new Date(right.recordDate || right.createdAt) - new Date(left.recordDate || left.createdAt)
+    )[0];
     return normalizeVitalSigns(latest.vitalSigns);
   }, [records]);
 

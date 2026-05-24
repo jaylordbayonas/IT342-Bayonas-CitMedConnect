@@ -7,7 +7,7 @@ const useUsers = () => {
   useEffect(() => {
     const loadUsers = async () => {
       try {
-        const res = await fetch('/api/users/');
+        const res = await fetch('http://localhost:8080/api/auth/users');
         if (!res.ok) {
           setUsers([]);
           return;

@@ -7,6 +7,7 @@ import axios from 'axios';
 
 // Base API configuration
 const API_BASE_URL = 'http://localhost:8080/api/users';
+const AUTH_API_BASE_URL = 'http://localhost:8080/api/auth';
 
 // Create axios instance with default configuration
 const apiClient = axios.create({
@@ -34,17 +35,24 @@ apiClient.interceptors.response.use(
 export const userService = {
   /**
    * Create a new user
-   * POST http://localhost:8080/api/users/
+   * POST http://localhost:8080/api/auth/register
    */
   createUser: async (userData) => {
     try {
-      // Ensure password field is included (required by backend)
-      const userDataWithPassword = {
-        ...userData,
-        password: userData.password || 'defaultPassword123' // Default password if not provided
-      };
-      
-      const response = await apiClient.post('/', userDataWithPassword);
+      const response = await axios.post(`${AUTH_API_BASE_URL}/register`, {
+        firstName: userData.firstName,
+        lastName:  userData.lastName,
+        email:     userData.email,
+        password:  userData.password || 'defaultPassword123',
+        schoolId:  userData.schoolId,
+        phone:     userData.phone,
+        gender:    userData.gender,
+        age:       userData.age,
+        role:      userData.role,
+      }, {
+        timeout: 10000,
+        headers: { 'Content-Type': 'application/json' },
+      });
       return {
         success: true,
         data: response.data,
@@ -53,7 +61,7 @@ export const userService = {
     } catch (error) {
       return {
         success: false,
-        error: error.response?.data?.error || error.message || 'Failed to create user',
+        error: error.response?.data?.message || error.message || 'Failed to create user',
         status: error.response?.status || 500
       };
     }
@@ -166,20 +174,24 @@ export const userService = {
 
   /**
    * Check if email exists
-   * GET http://localhost:8080/api/users/email/{email}
+   * GET http://localhost:8080/api/auth/users/email-exists?email=...
    */
   checkEmailExists: async (email) => {
     try {
-      const response = await apiClient.get(`/email/${encodeURIComponent(email)}`);
+      const response = await axios.get(`${AUTH_API_BASE_URL}/users/email-exists`, {
+        params: { email },
+        timeout: 10000,
+      });
+      // Backend returns { "exists": true/false }
       return {
         success: true,
-        data: response.data,
+        data: response.data?.exists === true,
         status: response.status
       };
     } catch (error) {
       return {
         success: false,
-        error: error.response?.data?.error || error.message || 'Failed to check email',
+        error: error.response?.data?.message || error.message || 'Failed to check email',
         status: error.response?.status || 500
       };
     }
@@ -187,11 +199,14 @@ export const userService = {
 
   /**
    * Login user with email and password
-   * POST http://localhost:8080/api/users/login
+   * POST http://localhost:8080/api/auth/login
    */
   login: async (email, password) => {
     try {
-      const response = await apiClient.post('/login', { email, password });
+      const response = await axios.post(`${AUTH_API_BASE_URL}/login`, { email, password }, {
+        timeout: 10000,
+        headers: { 'Content-Type': 'application/json' },
+      });
       return {
         success: true,
         data: response.data,
@@ -200,7 +215,7 @@ export const userService = {
     } catch (error) {
       return {
         success: false,
-        error: error.response?.data?.error || error.message || 'Login failed',
+        error: error.response?.data?.message || error.message || 'Login failed',
         status: error.response?.status || 401
       };
     }

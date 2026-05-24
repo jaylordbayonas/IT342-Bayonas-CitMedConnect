@@ -147,12 +147,14 @@ public class TimeSlotController {
     }
 
     private boolean isAdminRequest(String requesterId, String requesterRole) {
-        if (requesterRole == null || !"ADMIN".equalsIgnoreCase(requesterRole)) {
-            return false;
-        }
+        if (requesterRole == null) return false;
+        String role = requesterRole.trim().toUpperCase();
+        if (!"ADMIN".equals(role) && !"STAFF".equals(role)) return false;
 
         UserEntity requester = resolveUser(requesterId);
-        return requester != null && "ADMIN".equalsIgnoreCase(requester.getRole());
+        if (requester == null) return false;
+        String dbRole = requester.getRole() != null ? requester.getRole().trim().toUpperCase() : "";
+        return "ADMIN".equals(dbRole) || "STAFF".equals(dbRole);
     }
 
     private UserEntity resolveUser(String requesterId) {

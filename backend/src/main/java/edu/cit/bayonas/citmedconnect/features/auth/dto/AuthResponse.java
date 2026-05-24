@@ -61,48 +61,42 @@ public class AuthResponse {
         private String schoolId;
         private String name;
         private String email;
+        private String firstName;
+        private String lastName;
+        private String role;
 
         public UserData() {}
 
         public UserData(String schoolId, String name, String email) {
-            this.id = schoolId; // Keep for backward compatibility
-            this.schoolId = schoolId; // Add explicit schoolId field
-            this.name = name;
-            this.email = email;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-            this.schoolId = id; // Keep both fields in sync
-        }
-
-        public String getSchoolId() {
-            return schoolId;
-        }
-
-        public void setSchoolId(String schoolId) {
+            this.id = schoolId;
             this.schoolId = schoolId;
-            this.id = schoolId; // Keep both fields in sync
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
             this.name = name;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
             this.email = email;
         }
+
+        public UserData(String schoolId, String firstName, String lastName, String email, String role) {
+            this.id = schoolId;
+            this.schoolId = schoolId;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.name = firstName + " " + lastName;
+            this.email = email;
+            this.role = role;
+        }
+
+        public String getId() { return id; }
+        public void setId(String id) { this.id = id; this.schoolId = id; }
+        public String getSchoolId() { return schoolId; }
+        public void setSchoolId(String schoolId) { this.schoolId = schoolId; this.id = schoolId; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getFirstName() { return firstName; }
+        public void setFirstName(String firstName) { this.firstName = firstName; }
+        public String getLastName() { return lastName; }
+        public void setLastName(String lastName) { this.lastName = lastName; }
+        public String getRole() { return role; }
+        public void setRole(String role) { this.role = role; }
     }
 }

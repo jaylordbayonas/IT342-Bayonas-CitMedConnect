@@ -40,8 +40,11 @@ public class AppointmentController {
     }
     
     @GetMapping("/student/my-appointments")
-    public List<AppointmentEntity> getMyAppointments(@RequestParam(required = false) String userId) {
-        String resolvedUserId = resolveCurrentUserId(userId);
+    public List<AppointmentEntity> getMyAppointments(
+            @RequestParam(required = false) String userId,
+            @RequestHeader(value = "X-User-ID", required = false) String headerUserId) {
+        // Prefer explicit param, then header, then Security context
+        String resolvedUserId = resolveCurrentUserId(userId != null ? userId : headerUserId);
         if (resolvedUserId == null || resolvedUserId.isBlank()) {
             return List.of();
         }
