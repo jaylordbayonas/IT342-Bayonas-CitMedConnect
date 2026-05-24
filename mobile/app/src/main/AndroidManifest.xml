@@ -24,16 +24,29 @@
         </activity>
 
         <activity
+            android:name=".ui.LandingActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CitMedConnect.Auth" />
+
+        <activity
             android:name=".ui.LoginActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:theme="@style/Theme.CitMedConnect.Auth" />
 
         <activity
             android:name=".ui.RegisterActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:theme="@style/Theme.CitMedConnect.Auth" />
 
         <activity
             android:name=".ui.DashboardActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:theme="@style/Theme.CitMedConnect.Auth" />
+
+        <activity
+            android:name=".ui.AppointmentsActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CitMedConnect.Auth" />
 
     </application>
 

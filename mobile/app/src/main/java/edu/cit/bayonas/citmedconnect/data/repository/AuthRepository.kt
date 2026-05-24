@@ -13,7 +13,19 @@ class AuthRepository {
         return authService.login(LoginRequest(email, password))
     }
 
-    suspend fun register(name: String, email: String, password: String): RegisterResponse {
-        return authService.register(RegisterRequest(name, email, password))
+    suspend fun register(
+        schoolId: String,
+        firstName: String,
+        lastName: String,
+        email: String,
+        phone: String,
+        gender: String,
+        age: Int,
+        password: String,
+        role: String
+    ): RegisterResponse {
+        return authService.register(
+            RegisterRequest(schoolId, firstName, lastName, email, phone, gender, age, password, role)
+        )
     }
 }

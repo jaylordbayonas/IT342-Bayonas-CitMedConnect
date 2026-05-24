@@ -1,144 +1,651 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/white">
+    android:background="#F5F5F5">
 
-    <!-- Header -->
-    <LinearLayout
+    <!-- ===== SCROLLABLE CONTENT ===== -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/primary_red"
-        android:padding="32dp"
-        android:gravity="center">
-
-        <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="CitMedConnect Logo"
-            android:src="@drawable/ic_logo"
-            android:tint="@color/white" />
-
-        <TextView
-            android:id="@+id/welcomeText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Welcome to CitMedConnect"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:alpha="0.9" />
-    </LinearLayout>
-
-    <!-- Content -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="32dp"
-        android:gravity="center">
+        android:layout_height="match_parent"
+        android:paddingBottom="96dp"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:orientation="vertical">
 
-            <TextView
+            <!-- ===== HERO SECTION (260dp – room for top action buttons + content) ===== -->
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Your medical records are secure"
-                android:textSize="16sp"
-                android:textColor="@color/text_secondary"
-                android:gravity="center"
-                android:layout_marginBottom="32dp" />
+                android:layout_height="260dp"
+                android:background="@drawable/gradient_red_bg">
 
-            <!-- Quick Actions -->
+                <!-- Decorative background circle -->
+                <View
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="-50dp"
+                    android:layout_marginEnd="-50dp"
+                    android:background="@drawable/bg_circle_decoration"
+                    android:alpha="0.06" />
+
+                <!-- Mascot image (right side, bottom-aligned) -->
+                <ImageView
+                    android:layout_width="130dp"
+                    android:layout_height="210dp"
+                    android:layout_gravity="bottom|end"
+                    android:src="@drawable/mascot_cit"
+                    android:scaleType="fitEnd"
+                    android:contentDescription="CIT Mascot" />
+
+                <!-- ── Top action buttons row ── -->
+
+                <!-- Profile circular button (top-left) -->
+                <LinearLayout
+                    android:id="@+id/profileBtn"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_gravity="top|start"
+                    android:layout_marginTop="44dp"
+                    android:layout_marginStart="16dp"
+                    android:background="@drawable/circle_btn_white"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_profile"
+                        android:tint="#FFFFFF"
+                        android:contentDescription="Profile" />
+                </LinearLayout>
+
+                <!-- Calendar circular button (top-right) -->
+                <LinearLayout
+                    android:id="@+id/calendarBtn"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="44dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/circle_btn_white"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_calendar"
+                        android:tint="#FFFFFF"
+                        android:contentDescription="Calendar" />
+                </LinearLayout>
+
+                <!-- Hero text content (starts below the circular buttons) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="140dp"
+                    android:paddingTop="96dp"
+                    android:paddingBottom="20dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/greetingText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Good Morning,"
+                        android:textSize="13sp"
+                        android:textColor="#CCffffff"
+                        android:layout_marginBottom="2dp" />
+
+                    <TextView
+                        android:id="@+id/userNameText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="User"
+                        android:textSize="21sp"
+                        android:textStyle="bold"
+                        android:textColor="#FBBF24"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Book appointments, view your medical history, and stay connected with our healthcare team."
+                        android:textSize="11sp"
+                        android:textColor="#B3FFFFFF"
+                        android:lineSpacingExtra="2dp"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Book Appointment Button -->
+                    <LinearLayout
+                        android:id="@+id/bookAppointmentBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:orientation="horizontal"
+                        android:background="@drawable/btn_hero_action"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:src="@drawable/ic_calendar"
+                            android:tint="@color/primary_red"
+                            android:contentDescription="Calendar"
+                            android:layout_marginEnd="6dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Book Appointment"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary_red" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- ===== STATS GRID (sits cleanly below hero, no overlap) ===== -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center">
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
 
+                <!-- Stats Row 1 -->
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginEnd="12dp"
-                    android:padding="16dp"
-                    android:background="@drawable/card_background"
-                    android:gravity="center">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
 
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginBottom="8dp"
-                        android:contentDescription="Medical Records"
-                        android:src="@drawable/ic_records"
-                        android:tint="@color/primary_red" />
-
-                    <TextView
-                        android:layout_width="match_parent"
+                    <!-- Card 1: My Appointments (Blue) -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Records"
-                        android:textSize="12sp"
-                        android:textColor="@color/text_primary"
-                        android:gravity="center" />
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/section_card_bg"
+                        android:padding="14dp"
+                        android:elevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <LinearLayout
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:background="@drawable/stat_icon_bg_blue"
+                                android:gravity="center">
+                                <ImageView
+                                    android:layout_width="21dp"
+                                    android:layout_height="21dp"
+                                    android:src="@drawable/ic_calendar"
+                                    android:tint="#2196F3"
+                                    android:contentDescription="Calendar" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:paddingStart="10dp">
+                                <TextView
+                                    android:id="@+id/stat1Value"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#212121" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="My Appointments"
+                                    android:textSize="11sp"
+                                    android:textColor="#757575" />
+                                <TextView
+                                    android:id="@+id/stat1Trend"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0 upcoming"
+                                    android:textSize="10sp"
+                                    android:textColor="#2196F3" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Card 2: Upcoming (Amber) -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/section_card_bg"
+                        android:padding="14dp"
+                        android:elevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <LinearLayout
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:background="@drawable/stat_icon_bg_amber"
+                                android:gravity="center">
+                                <ImageView
+                                    android:layout_width="21dp"
+                                    android:layout_height="21dp"
+                                    android:src="@drawable/ic_clock"
+                                    android:tint="#FFC107"
+                                    android:contentDescription="Clock" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:paddingStart="10dp">
+                                <TextView
+                                    android:id="@+id/stat2Value"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#212121" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Upcoming"
+                                    android:textSize="11sp"
+                                    android:textColor="#757575" />
+                                <TextView
+                                    android:id="@+id/stat2Trend"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="This week"
+                                    android:textSize="10sp"
+                                    android:textColor="#FFC107" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
                 </LinearLayout>
 
+                <!-- Stats Row 2 -->
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="12dp"
-                    android:padding="16dp"
-                    android:background="@drawable/card_background"
-                    android:gravity="center">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginBottom="8dp"
-                        android:contentDescription="Appointments"
-                        android:src="@drawable/ic_appointment"
-                        android:tint="@color/primary_red" />
-
-                    <TextView
-                        android:layout_width="match_parent"
+                    <!-- Card 3: Completed (Green) -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Appointments"
-                        android:textSize="12sp"
-                        android:textColor="@color/text_primary"
-                        android:gravity="center" />
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/section_card_bg"
+                        android:padding="14dp"
+                        android:elevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <LinearLayout
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:background="@drawable/stat_icon_bg_green"
+                                android:gravity="center">
+                                <ImageView
+                                    android:layout_width="21dp"
+                                    android:layout_height="21dp"
+                                    android:src="@drawable/ic_trending_up"
+                                    android:tint="#4CAF50"
+                                    android:contentDescription="Trending" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:paddingStart="10dp">
+                                <TextView
+                                    android:id="@+id/stat3Value"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#212121" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Completed"
+                                    android:textSize="11sp"
+                                    android:textColor="#757575" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="All time"
+                                    android:textSize="10sp"
+                                    android:textColor="#4CAF50" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Card 4: Notifications (Purple) -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/section_card_bg"
+                        android:padding="14dp"
+                        android:elevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <LinearLayout
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:background="@drawable/stat_icon_bg_purple"
+                                android:gravity="center">
+                                <ImageView
+                                    android:layout_width="21dp"
+                                    android:layout_height="21dp"
+                                    android:src="@drawable/ic_bell"
+                                    android:tint="#9C27B0"
+                                    android:contentDescription="Bell" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:paddingStart="10dp">
+                                <TextView
+                                    android:id="@+id/stat4Value"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#212121" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Notifications"
+                                    android:textSize="11sp"
+                                    android:textColor="#757575" />
+                                <TextView
+                                    android:id="@+id/stat4Trend"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="None"
+                                    android:textSize="10sp"
+                                    android:textColor="#9C27B0" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
                 </LinearLayout>
+
             </LinearLayout>
+
+            <!-- ===== RECENT APPOINTMENTS SECTION ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/section_card_bg"
+                android:elevation="2dp">
+
+                <!-- Section header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="12dp"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="#C62828"
+                        android:layout_marginEnd="10dp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="My Upcoming Appointments"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121" />
+
+                    <LinearLayout
+                        android:id="@+id/viewAllAppointments"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="4dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="View All"
+                            android:textSize="12sp"
+                            android:textColor="@color/primary_red"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_arrow_right"
+                            android:tint="@color/primary_red"
+                            android:contentDescription="Arrow"
+                            android:layout_marginStart="2dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp" />
+
+                <LinearLayout
+                    android:id="@+id/appointmentsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp" />
+
+                <LinearLayout
+                    android:id="@+id/emptyState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="32dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_calendar"
+                        android:tint="#BDBDBD"
+                        android:contentDescription="No appointments"
+                        android:layout_marginBottom="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No upcoming appointments"
+                        android:textSize="14sp"
+                        android:textColor="#9E9E9E"
+                        android:gravity="center" />
+                </LinearLayout>
+
+            </LinearLayout>
+
         </LinearLayout>
-    </FrameLayout>
+    </androidx.core.widget.NestedScrollView>
 
-    <!-- Logout Button -->
-    <Button
-        android:id="@+id/logoutButton"
+    <!-- ===== FLOATING BOTTOM NAVIGATION BAR (thin, minimal, 5 equal items) ===== -->
+    <LinearLayout
+        android:id="@+id/navBar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="LOGOUT"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="@color/white"
-        android:background="@drawable/button_primary"
-        android:layout_margin="32dp" />
+        android:layout_height="54dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal"
+        android:background="@drawable/nav_floating_bg"
+        android:elevation="10dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp">
 
-</LinearLayout>
+        <!-- HOME (active) -->
+        <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/nav_item_active_bg"
+            android:padding="6dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_home"
+                android:tint="#FFFFFF"
+                android:contentDescription="Home" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Home"
+                android:textSize="9sp"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- APPOINTMENTS -->
+        <LinearLayout
+            android:id="@+id/navAppointments"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:alpha="0.55"
+            android:padding="6dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_appointment"
+                android:tint="#FFFFFF"
+                android:contentDescription="Appointments" />
+        </LinearLayout>
+
+        <!-- MEDICAL RECORDS (center – same style as others) -->
+        <LinearLayout
+            android:id="@+id/navMedicalRecords"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:alpha="0.55"
+            android:padding="6dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_records"
+                android:tint="#FFFFFF"
+                android:contentDescription="Medical Records" />
+        </LinearLayout>
+
+        <!-- NOTIFICATIONS -->
+        <LinearLayout
+            android:id="@+id/navNotifications"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:alpha="0.55"
+            android:padding="6dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_bell"
+                android:tint="#FFFFFF"
+                android:contentDescription="Notifications" />
+        </LinearLayout>
+
+        <!-- PROFILE -->
+        <LinearLayout
+            android:id="@+id/navProfile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:alpha="0.55"
+            android:padding="6dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_profile"
+                android:tint="#FFFFFF"
+                android:contentDescription="Profile" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

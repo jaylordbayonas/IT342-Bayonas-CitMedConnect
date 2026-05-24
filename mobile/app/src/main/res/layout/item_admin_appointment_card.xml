@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/section_card_bg"
+    android:elevation="2dp"
+    android:clipToOutline="true">
+
+    <!-- Left status accent strip (color set programmatically) -->
+    <View
+        android:id="@+id/statusAccent"
+        android:layout_width="5dp"
+        android:layout_height="match_parent"
+        android:background="#2196F3" />
+
+    <!-- Card content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="12dp">
+
+        <!-- Row 1: Reason + Status badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/appointmentReason"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Medical Appointment"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/statusBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Scheduled"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="@drawable/badge_scheduled_bg"
+                android:textColor="#2196F3" />
+        </LinearLayout>
+
+        <!-- Row 2: Student User ID (admin-only) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="5dp">
+
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:src="@drawable/ic_user"
+                android:tint="#BDBDBD"
+                android:contentDescription="User"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/appointmentUserId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="23-1111-111"
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/appointmentUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Juan Santos"
+                android:textSize="12sp"
+                android:textColor="#9E9E9E" />
+        </LinearLayout>
+
+        <!-- Row 3: Date/Time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="5dp">
+
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:src="@drawable/ic_clock"
+                android:tint="#BDBDBD"
+                android:contentDescription="Time"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/appointmentDateTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12:41 · May 26, 2026"
+                android:textSize="12sp"
+                android:textColor="#757575" />
+        </LinearLayout>
+
+        <!-- Row 4: Location -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:src="@drawable/ic_location"
+                android:tint="#BDBDBD"
+                android:contentDescription="Location"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/appointmentLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Main Clinic"
+                android:textSize="12sp"
+                android:textColor="#757575" />
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#F0F0F0"
+            android:layout_marginBottom="10dp" />
+
+        <!-- Actions row: View | Complete | Reschedule | Cancel -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start">
+
+            <!-- View button (always visible) -->
+            <LinearLayout
+                android:id="@+id/btnView"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/action_btn_blue"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
+                    android:src="@drawable/ic_eye"
+                    android:tint="#2196F3"
+                    android:contentDescription="View Details" />
+            </LinearLayout>
+
+            <!-- Mark Complete button (Scheduled only) -->
+            <LinearLayout
+                android:id="@+id/btnComplete"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/action_btn_green"
+                android:gravity="center"
+                android:layout_marginStart="8dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
+                    android:src="@drawable/ic_check"
+                    android:tint="#4CAF50"
+                    android:contentDescription="Mark Complete" />
+            </LinearLayout>
+
+            <!-- Reschedule button (Scheduled only) -->
+            <LinearLayout
+                android:id="@+id/btnReschedule"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/action_btn_amber"
+                android:gravity="center"
+                android:layout_marginStart="8dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
+                    android:src="@drawable/ic_calendar"
+                    android:tint="#FF8F00"
+                    android:contentDescription="Reschedule" />
+            </LinearLayout>
+
+            <!-- Cancel button (Scheduled only) -->
+            <LinearLayout
+                android:id="@+id/btnCancel"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/action_btn_red_outline"
+                android:gravity="center"
+                android:layout_marginStart="8dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
+                    android:src="@drawable/ic_close"
+                    android:tint="#F44336"
+                    android:contentDescription="Cancel Appointment" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</FrameLayout>
