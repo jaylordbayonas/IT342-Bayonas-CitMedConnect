@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CitMedConnect</string>
+    <string name="gender_prompt">Select Gender</string>
+    <string name="role_prompt">Select Role</string>
+
+    <string-array name="gender_options">
+        <item>Select Gender</item>
+        <item>Male</item>
+        <item>Female</item>
+        <item>Prefer not to say</item>
+    </string-array>
+
+    <string-array name="role_options">
+        <item>Student</item>
+        <item>Staff</item>
+        <item>Faculty</item>
+    </string-array>
 </resources>

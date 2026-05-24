@@ -22,7 +22,7 @@ class AuthViewModel : ViewModel() {
 
     fun login(email: String, password: String) {
         if (!isValidEmail(email)) {
-            _loginResult.value = AuthResult(success = false, message = "Please enter a valid email")
+            _loginResult.value = AuthResult(success = false, message = "Please enter a valid email address")
             return
         }
         if (password.isBlank()) {
@@ -47,14 +47,47 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun register(name: String, email: String, password: String, confirmPassword: String) {
+    fun register(
+        schoolId: String,
+        firstName: String,
+        lastName: String,
+        email: String,
+        phone: String,
+        gender: String,
+        age: String,
+        password: String,
+        confirmPassword: String,
+        role: String
+    ) {
+        val ageInt = age.trim().toIntOrNull()
+
         when {
-            name.isBlank() -> {
-                _registerResult.value = AuthResult(success = false, message = "Please enter your name")
+            schoolId.isBlank() -> {
+                _registerResult.value = AuthResult(success = false, message = "Please enter your Student / Staff ID")
                 return
             }
-            !isValidEmail(email) -> {
-                _registerResult.value = AuthResult(success = false, message = "Please enter a valid email")
+            firstName.isBlank() -> {
+                _registerResult.value = AuthResult(success = false, message = "Please enter your first name")
+                return
+            }
+            lastName.isBlank() -> {
+                _registerResult.value = AuthResult(success = false, message = "Please enter your last name")
+                return
+            }
+            gender == "Select Gender" || gender.isBlank() -> {
+                _registerResult.value = AuthResult(success = false, message = "Please select your gender")
+                return
+            }
+            ageInt == null || ageInt < 15 || ageInt > 100 -> {
+                _registerResult.value = AuthResult(success = false, message = "Please enter a valid age (15–100)")
+                return
+            }
+            !isValidCitEmail(email) -> {
+                _registerResult.value = AuthResult(success = false, message = "Email must be in the format: firstname.lastname@cit.edu")
+                return
+            }
+            phone.isBlank() -> {
+                _registerResult.value = AuthResult(success = false, message = "Please enter your phone number")
                 return
             }
             password.length < 6 -> {
@@ -70,7 +103,17 @@ class AuthViewModel : ViewModel() {
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val response = repository.register(name, email, password)
+                val response = repository.register(
+                    schoolId = schoolId.trim(),
+                    firstName = firstName.trim(),
+                    lastName = lastName.trim(),
+                    email = email.trim().lowercase(),
+                    phone = phone.trim(),
+                    gender = gender,
+                    age = ageInt!!,
+                    password = password,
+                    role = role.lowercase()
+                )
                 _registerResult.value = if (response.success) {
                     AuthResult(success = true, message = response.message, user = response.user)
                 } else {
@@ -86,6 +129,10 @@ class AuthViewModel : ViewModel() {
 
     private fun isValidEmail(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    private fun isValidCitEmail(email: String): Boolean {
+        return email.trim().matches(Regex("^[a-zA-Z]+\\.[a-zA-Z]+@cit\\.edu$"))
     }
 }
 

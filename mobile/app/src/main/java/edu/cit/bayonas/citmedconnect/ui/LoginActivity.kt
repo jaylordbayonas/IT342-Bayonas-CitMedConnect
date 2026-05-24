@@ -2,9 +2,12 @@ package edu.cit.bayonas.citmedconnect.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -21,9 +24,12 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var registerLink: TextView
     private lateinit var loadingProgress: ProgressBar
     private lateinit var errorMessage: TextView
+    private lateinit var togglePassword: ImageButton
+    private var passwordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.statusBarColor = getColor(R.color.status_bar_auth)
         setContentView(R.layout.activity_login)
 
         viewModel = ViewModelProvider(this).get(AuthViewModel::class.java)
@@ -34,6 +40,19 @@ class LoginActivity : AppCompatActivity() {
         registerLink = findViewById(R.id.registerLink)
         loadingProgress = findViewById(R.id.loadingProgress)
         errorMessage = findViewById(R.id.errorMessage)
+        togglePassword = findViewById(R.id.togglePassword)
+
+        togglePassword.setOnClickListener {
+            passwordVisible = !passwordVisible
+            if (passwordVisible) {
+                passwordInput.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                togglePassword.setImageResource(R.drawable.ic_eye)
+            } else {
+                passwordInput.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                togglePassword.setImageResource(R.drawable.ic_eye_off)
+            }
+            passwordInput.setSelection(passwordInput.text.length)
+        }
 
         loginButton.setOnClickListener {
             val email = emailInput.text.toString().trim()
@@ -44,6 +63,14 @@ class LoginActivity : AppCompatActivity() {
         registerLink.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
+        }
+
+        findViewById<LinearLayout>(R.id.googleLogin).setOnClickListener {
+            Toast.makeText(this, "Google sign-in coming soon", Toast.LENGTH_SHORT).show()
+        }
+
+        findViewById<LinearLayout>(R.id.githubLogin).setOnClickListener {
+            Toast.makeText(this, "GitHub sign-in coming soon", Toast.LENGTH_SHORT).show()
         }
 
         observeViewModel()
@@ -58,8 +85,9 @@ class LoginActivity : AppCompatActivity() {
         viewModel.loginResult.observe(this) { result ->
             if (result.success) {
                 Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
-                // Navigate to Dashboard
-                startActivity(Intent(this, DashboardActivity::class.java))
+                val intent = Intent(this, DashboardActivity::class.java)
+                intent.putExtra("USER_NAME", result.user?.name ?: "User")
+                startActivity(intent)
                 finish()
             } else {
                 errorMessage.text = result.message

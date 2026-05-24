@@ -11,8 +11,14 @@
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
+    <style name="Theme.CitMedConnect.Auth" parent="Theme.CitMedConnect">
+        <item name="android:statusBarColor">@color/status_bar_auth</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
     <!-- Primary Colors -->
     <color name="primary_red">#B71C1C</color>
+    <color name="status_bar_auth">#C62828</color>
     <color name="primary_red_dark">#8B0000</color>
     <color name="primary_red_light">#D32F2F</color>
 

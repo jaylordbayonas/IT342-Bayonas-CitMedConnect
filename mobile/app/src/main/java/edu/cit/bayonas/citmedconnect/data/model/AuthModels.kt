@@ -13,9 +13,15 @@ data class LoginResponse(
 )
 
 data class RegisterRequest(
-    val name: String,
+    val schoolId: String,
+    val firstName: String,
+    val lastName: String,
     val email: String,
-    val password: String
+    val phone: String,
+    val gender: String,
+    val age: Int,
+    val password: String,
+    val role: String = "student"
 )
 
 data class RegisterResponse(
@@ -28,5 +34,6 @@ data class RegisterResponse(
 data class UserData(
     val id: String,
     val name: String,
-    val email: String
+    val email: String,
+    val schoolId: String? = null
 )
