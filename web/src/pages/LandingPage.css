@@ -1,0 +1,636 @@
+/* ============================================
+   LandingPage.css
+   All selectors scoped to .lp-* to avoid
+   bleeding into other pages / global styles.
+   ============================================ */
+
+/* ── Root shell ── */
+.lp-root {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  background: linear-gradient(145deg, #1c0808 0%, #2e1010 50%, #1c0808 100%);
+  position: relative;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Ambient glow orbs ── */
+.lp-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(100px);
+  z-index: 0;
+}
+
+.lp-orb-1 {
+  width: 680px;
+  height: 680px;
+  background: radial-gradient(circle, rgba(180, 30, 30, 0.38) 0%, transparent 68%);
+  top: -240px;
+  left: -200px;
+}
+
+.lp-orb-2 {
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, rgba(139, 26, 26, 0.28) 0%, transparent 68%);
+  bottom: -160px;
+  right: -140px;
+}
+
+.lp-orb-3 {
+  width: 440px;
+  height: 440px;
+  background: radial-gradient(circle, rgba(200, 40, 40, 0.2) 0%, transparent 68%);
+  top: 50%;
+  left: 38%;
+  transform: translate(-50%, -50%);
+}
+
+/* ── Split layout ── */
+.lp-split {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
+   LEFT PANEL
+   ============================================ */
+
+.lp-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 52px 48px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Galaxy WebGL background */
+.lp-galaxy {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle dot-grid texture */
+.lp-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+/* ── Logo / brand row ── */
+.lp-brand {
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-logo-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 2px 8px rgba(139, 26, 26, 0.35);
+}
+
+.lp-logo-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f5eded;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+.lp-logo-plus {
+  color: #c84040;
+  font-weight: 900;
+}
+
+/* ── Mascot area ── */
+.lp-mascot-wrap {
+  position: relative;
+  width: 440px;
+  height: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+  flex-shrink: 0;
+}
+
+.lp-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid;
+  animation: lp-pulse 3.5s ease-in-out infinite;
+}
+
+.lp-ring-outer {
+  width: 420px;
+  height: 420px;
+  border-color: rgba(139, 26, 26, 0.22);
+  animation-delay: 0s;
+}
+
+.lp-ring-mid {
+  width: 340px;
+  height: 340px;
+  border-color: rgba(192, 57, 57, 0.28);
+  background: radial-gradient(circle, rgba(139, 26, 26, 0.07) 0%, transparent 70%);
+  animation-delay: 0.7s;
+}
+
+.lp-ring-inner {
+  width: 264px;
+  height: 264px;
+  border-color: rgba(220, 100, 100, 0.3);
+  background: radial-gradient(circle, rgba(139, 26, 26, 0.13) 0%, transparent 70%);
+  animation-delay: 1.4s;
+}
+
+@keyframes lp-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.6; }
+  50%       { transform: scale(1.05); opacity: 1;   }
+}
+
+.lp-mascot-img {
+  position: relative;
+  z-index: 2;
+  width: 380px;
+  height: 380px;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 64px rgba(139, 26, 26, 0.48));
+  animation: lp-float 4.5s ease-in-out infinite;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@keyframes lp-float {
+  0%, 100% { transform: translateY(0);    }
+  50%       { transform: translateY(-13px); }
+}
+
+/* ── Hero text ── */
+.lp-hero-text {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.lp-heading {
+  font-size: 28px;
+  font-weight: 800;
+  color: #f8f0f0;
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+  margin: 0 0 12px;
+}
+
+.lp-heading-accent {
+  background: linear-gradient(135deg, #e87070 0%, #c84040 45%, #8B1A1A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lp-subtitle {
+  font-size: 14px;
+  color: rgba(248, 230, 230, 0.5);
+  line-height: 1.65;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   RIGHT PANEL
+   ============================================ */
+
+.lp-right {
+  width: 460px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 52px 44px;
+  min-height: 100vh;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.025);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(28px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 26, 26, 0.4) transparent;
+}
+
+.lp-right::-webkit-scrollbar       { width: 4px; }
+.lp-right::-webkit-scrollbar-track { background: transparent; }
+.lp-right::-webkit-scrollbar-thumb { background: rgba(139, 26, 26, 0.4); border-radius: 2px; }
+
+/* ── Card ── */
+.lp-card {
+  width: 100%;
+  max-width: 368px;
+  margin: auto;
+}
+
+/* ── Tabs ── */
+.lp-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 26px;
+}
+
+.lp-tab {
+  flex: 1;
+  padding: 12px 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.38);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  margin-bottom: -1px;
+  font-family: inherit;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.lp-tab-active {
+  color: #c84040;
+  border-bottom-color: #c84040;
+}
+
+.lp-tab:hover:not(.lp-tab-active) {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ── Panel header ── */
+.lp-panel-header { margin-bottom: 22px; }
+
+.lp-panel-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f8f0f0;
+  margin: 0 0 4px;
+  letter-spacing: -0.3px;
+}
+
+.lp-panel-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.42);
+  margin: 0;
+}
+
+/* ── Form ── */
+.lp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.lp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ── Input wrapper ── */
+.lp-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lp-input-icon {
+  position: absolute;
+  left: 13px;
+  color: rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.lp-input {
+  width: 100%;
+  padding: 11px 13px 11px 40px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  font-size: 13px;
+  color: #ffffff;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lp-input::placeholder { color: rgba(255, 255, 255, 0.28); }
+
+/* Override browser autofill background + text color */
+.lp-input:-webkit-autofill,
+.lp-input:-webkit-autofill:hover,
+.lp-input:-webkit-autofill:focus,
+.lp-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #1e0a0a inset;
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.09);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.lp-input:focus {
+  border-color: rgba(139, 26, 26, 0.75);
+  background: rgba(139, 26, 26, 0.08);
+  box-shadow: 0 0 0 3px rgba(139, 26, 26, 0.14);
+}
+
+.lp-input-err  { border-color: rgba(248, 113, 113, 0.6) !important; }
+.lp-input-noicon { padding-left: 13px; }
+
+/* Remove number spinner */
+.lp-input[type="number"]::-webkit-inner-spin-button,
+.lp-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.lp-input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
+.lp-err-msg {
+  font-size: 11px;
+  color: #f87171;
+  padding-left: 2px;
+}
+
+/* ── Eye toggle ── */
+.lp-eye-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+
+.lp-eye-btn:hover { color: rgba(255, 255, 255, 0.65); }
+
+/* ── Select ── */
+.lp-select {
+  width: 100%;
+  padding: 11px 13px;
+  background: #1e0a12;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  font-size: 13px;
+  color: #f0e0e0;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  font-family: inherit;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.lp-select:focus {
+  border-color: rgba(139, 26, 26, 0.75);
+  background: rgba(139, 26, 26, 0.08);
+}
+
+.lp-select option { background: #1a0408; color: #f0e8e8; }
+
+/* ── Remember-me row ── */
+.lp-options-row { display: flex; align-items: center; }
+
+.lp-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+}
+
+.lp-checkbox-label input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #8B1A1A;
+  cursor: pointer;
+}
+
+/* ── Primary button ── */
+.lp-btn-primary {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  background: linear-gradient(135deg, #8B1A1A 0%, #6B0F0F 100%);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(139, 26, 26, 0.45);
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
+}
+
+.lp-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #a82222 0%, #8B1A1A 100%);
+  box-shadow: 0 6px 28px rgba(139, 26, 26, 0.6);
+  transform: translateY(-1px);
+}
+
+.lp-btn-primary:active:not(:disabled) { transform: translateY(0); }
+.lp-btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.lp-btn-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: lp-spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes lp-spin { to { transform: rotate(360deg); } }
+
+/* ── Divider ── */
+.lp-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.lp-divider::before,
+.lp-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── GitHub button ── */
+.lp-btn-oauth {
+  width: 100%;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.lp-btn-oauth:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.lp-btn-oauth:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Switch row ── */
+.lp-switch-text {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.lp-switch-link {
+  background: none;
+  border: none;
+  color: #c84040;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s ease;
+}
+
+.lp-switch-link:hover { color: #e06060; }
+
+/* ── Alert messages ── */
+.lp-alert {
+  padding: 10px 13px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.lp-alert-error {
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  color: #fca5a5;
+}
+
+.lp-alert-success {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  color: #6ee7b7;
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.lp-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #120808;
+}
+
+.lp-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(139, 26, 26, 0.25);
+  border-top-color: #8B1A1A;
+  border-radius: 50%;
+  animation: lp-spin 0.8s linear infinite;
+}
+
+.lp-loading-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 960px) {
+  .lp-split { flex-direction: column; }
+
+  .lp-left {
+    padding: 92px 32px 36px;
+    min-height: auto;
+  }
+
+  .lp-mascot-wrap  { width: 320px; height: 320px; margin-bottom: 22px; }
+  .lp-mascot-img   { width: 280px; height: 280px; }
+  .lp-ring-outer   { width: 308px; height: 308px; }
+  .lp-ring-mid     { width: 246px; height: 246px; }
+  .lp-ring-inner   { width: 192px; height: 192px; }
+  .lp-heading      { font-size: 23px; }
+
+  .lp-right {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 36px 28px 52px;
+    min-height: auto;
+    overflow-y: visible;
+    backdrop-filter: none;
+  }
+
+  .lp-card { max-width: 480px; }
+}
+
+@media (max-width: 520px) {
+  .lp-left   { padding: 76px 20px 28px; }
+  .lp-right  { padding: 28px 18px 44px; }
+  .lp-row    { grid-template-columns: 1fr; }
+  .lp-heading { font-size: 20px; }
+  .lp-card   { max-width: 100%; }
+}
