@@ -217,7 +217,20 @@ public class AppointmentService {
         }
         timeSlotRepository.save(timeSlot);
 
-        return appointmentRepository.save(appointment);
+        AppointmentEntity savedAppointment = appointmentRepository.save(appointment);
+
+        try {
+            String studentName = user.getFirstName() + " " + user.getLastName();
+            notificationService.sendNotificationToAllStaff(
+                    "New Appointment Booked",
+                    studentName + " has booked a new appointment. Reason: "
+                            + (reason != null ? reason : "Not specified"),
+                    "appointment");
+        } catch (Exception e) {
+            System.err.println("Failed to send notification to staff: " + e.getMessage());
+        }
+
+        return savedAppointment;
     }
 
     public AppointmentEntity rescheduleAppointment(Long appointmentId, Long newTimeSlotId) {

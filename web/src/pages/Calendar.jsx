@@ -1,8 +1,3 @@
-// ============================================
-// CALENDAR PAGE - UPDATED WITH NEW HOOKS
-// src/pages/Calendar.jsx
-// ============================================
-
 import React, { useState, useMemo, useCallback } from 'react';
 import useAuth from '../hooks/useAuth';
 import useAppointments from '../hooks/useAppointments';
@@ -12,32 +7,12 @@ import './Calendar.css';
 
 const Calendar = () => {
   const { isStaff } = useAuth();
-  const { appointments: userAppointments, loading, error } = useAppointments();
-  
+  const { userAppointments, loading, error } = useAppointments();
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Debug: Log appointments when they change
-  React.useEffect(() => {
-    console.log('=== CALENDAR DEBUG ===');
-    console.log('Is Staff:', isStaff);
-    console.log('User appointments:', userAppointments);
-    console.log('Appointments count:', userAppointments?.length || 0);
-    if (userAppointments && userAppointments.length > 0) {
-      console.log('First appointment:', userAppointments[0]);
-      console.log('Date field:', userAppointments[0].scheduledDate || userAppointments[0].date);
-      console.log('Time field:', userAppointments[0].scheduledTime || userAppointments[0].time);
-      console.log('Status:', userAppointments[0].status);
-      console.log('Student ID:', userAppointments[0].studentId);
-    }
-    console.log('All appointments:', userAppointments);
-  }, [userAppointments, isStaff]);
-
-  // ============================================
-  // TIME SLOTS CONFIGURATION
-  // ============================================
-  
-  // ✅ useMemo: Generate time slots (8 AM - 6 PM)
+  // Generate time slots (8 AM – 6 PM, 30-min intervals)
   const timeSlots = useMemo(() => {
     const slots = [];
     for (let hour = 8; hour <= 18; hour++) {
@@ -48,301 +23,238 @@ const Calendar = () => {
     return slots;
   }, []);
 
-  // ============================================
-  // DATE UTILITIES
-  // ============================================
-  
-  // ✅ useCallback: Get week days starting from Monday
+  // Get week days starting from Monday
   const getWeekDays = useCallback((date) => {
     const d = new Date(date);
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(d.setDate(diff));
-    
     const weekDays = [];
     for (let i = 0; i < 7; i++) {
-      const day = new Date(monday);
-      day.setDate(monday.getDate() + i);
-      weekDays.push(day);
+      const wd = new Date(monday);
+      wd.setDate(monday.getDate() + i);
+      weekDays.push(wd);
     }
     return weekDays;
   }, []);
 
-  // ✅ useMemo: Calculate current week days
-  const weekDays = useMemo(() => 
-    getWeekDays(currentDate), 
-    [currentDate, getWeekDays]
-  );
+  const weekDays = useMemo(() => getWeekDays(currentDate), [currentDate, getWeekDays]);
 
-  // ✅ useCallback: Format date to YYYY-MM-DD
+  // Format date using local components to avoid UTC timezone shift in UTC+ zones
   const formatDate = useCallback((date) => {
-    return date.toISOString().split('T')[0];
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }, []);
 
-  // ✅ useCallback: Check if date is today
   const isToday = useCallback((date) => {
-    const today = new Date();
-    return formatDate(date) === formatDate(today);
+    return formatDate(date) === formatDate(new Date());
   }, [formatDate]);
 
-  // ✅ useCallback: Check if date is selected
   const isSelected = useCallback((date) => {
     return formatDate(date) === formatDate(selectedDate);
   }, [formatDate, selectedDate]);
 
-  // ============================================
-  // APPOINTMENT UTILITIES
-  // ============================================
-  
-  // ✅ useMemo: Map appointments by date and time for quick lookup
+  // Map appointments by "YYYY-MM-DD-HH:MM" key → array
   const appointmentMap = useMemo(() => {
     const map = {};
-    
-    if (!userAppointments || userAppointments.length === 0) {
-      console.log('No appointments to map');
-      return map;
-    }
-    
+    if (!userAppointments?.length) return map;
+
     userAppointments.forEach(apt => {
       try {
-        // Get date - handle multiple possible field names
-        const dateValue = apt.scheduledDate || apt.date || apt.appointmentDate;
-        if (!dateValue) {
-          console.warn('Appointment missing date:', apt);
-          return;
-        }
-        
-        // Get time - handle multiple possible field names and formats
-        let timeValue = apt.scheduledTime || apt.time || apt.appointmentTime;
-        if (!timeValue) {
-          console.warn('Appointment missing time:', apt);
-          return;
-        }
-        
-        // Normalize time format to HH:MM (remove seconds if present)
-        if (timeValue.length === 8) { // HH:MM:SS format
-          timeValue = timeValue.substring(0, 5); // Get HH:MM only
-        }
-        
-        // Format date to YYYY-MM-DD
-        const dateStr = formatDate(new Date(dateValue));
-        const key = `${dateStr}-${timeValue}`;
-        
-        console.log(`Mapping appointment: key=${key}, appointment=`, apt);
-        map[key] = apt;
-      } catch (error) {
-        console.error('Error mapping appointment:', apt, error);
+        const dateValue = apt.scheduledDate ?? apt.date ?? apt.appointmentDate;
+        if (!dateValue) return;
+
+        const timeStr = apt.scheduledTime ?? apt.time ?? apt.appointmentTime;
+        if (!timeStr) return;
+
+        const parts = String(timeStr).split(':');
+        const normalizedTime = `${parts[0].padStart(2, '0')}:${(parts[1] ?? '00').padStart(2, '0')}`;
+
+        const dateStr = String(dateValue).includes('T')
+          ? String(dateValue).split('T')[0]
+          : String(dateValue).substring(0, 10);
+
+        const key = `${dateStr}-${normalizedTime}`;
+        if (!map[key]) map[key] = [];
+        map[key].push(apt);
+      } catch {
+        // skip malformed entries
       }
     });
-    
-    console.log('Final appointment map:', map);
-    console.log('Total appointments mapped:', Object.keys(map).length);
-    return map;
-  }, [userAppointments, formatDate]);
 
-  // ✅ useCallback: Get appointment for specific slot
-  const getAppointmentForSlot = useCallback((date, time) => {
+    return map;
+  }, [userAppointments]);
+
+  const getAppointmentsForSlot = useCallback((date, time) => {
     const dateStr = formatDate(date);
-    
-    // Normalize time to HH:MM format
-    let normalizedTime = time;
-    if (time.length === 8) {
-      normalizedTime = time.substring(0, 5);
-    }
-    
-    const key = `${dateStr}-${normalizedTime}`;
-    const appointment = appointmentMap[key];
-    
-    // Debug only for appointments that exist
-    if (appointment) {
-      console.log(`Found appointment for slot: ${key}`, appointment);
-    }
-    
-    return appointment || null;
+    const parts = String(time).split(':');
+    const normalizedTime = `${parts[0].padStart(2, '0')}:${(parts[1] ?? '00').padStart(2, '0')}`;
+    return appointmentMap[`${dateStr}-${normalizedTime}`] ?? [];
   }, [formatDate, appointmentMap]);
 
-  // ============================================
-  // NAVIGATION HANDLERS
-  // ============================================
-  
-  // ✅ useCallback: Navigate to previous week
   const previousWeek = useCallback(() => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() - 7);
-    setCurrentDate(newDate);
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() - 7);
+    setCurrentDate(d);
   }, [currentDate]);
 
-  // ✅ useCallback: Navigate to next week
   const nextWeek = useCallback(() => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + 7);
-    setCurrentDate(newDate);
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() + 7);
+    setCurrentDate(d);
   }, [currentDate]);
 
-  // ✅ useCallback: Go to today
   const goToToday = useCallback(() => {
     const today = new Date();
     setCurrentDate(today);
     setSelectedDate(today);
   }, []);
 
-  // ✅ useCallback: Select a date
-  const handleDateSelect = useCallback((date) => {
-    setSelectedDate(date);
-  }, []);
+  const handleDateSelect = useCallback((date) => setSelectedDate(date), []);
 
-  // ============================================
-  // RENDER
-  // ============================================
-  
+  const appointmentCount = userAppointments?.length ?? 0;
+
   return (
     <div className="calendar-page">
       <div className="page-header">
         <div>
           <h1 className="page-title">Calendar</h1>
           <p className="page-subtitle">
-            {isStaff 
+            {isStaff
               ? 'View all scheduled appointments'
-              : 'View and manage your appointment schedule'
-            }
+              : 'View and manage your appointment schedule'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          {userAppointments && userAppointments.length > 0 && (
-            <span className="badge" style={{ 
-              background: '#4caf50', 
-              color: 'white', 
-              padding: '0.5rem 1rem', 
+          {appointmentCount > 0 && (
+            <span style={{
+              background: '#8B1A1A',
+              color: 'white',
+              padding: '0.375rem 0.875rem',
               borderRadius: '20px',
-              fontSize: '0.875rem'
+              fontSize: '0.8125rem',
+              fontWeight: 600,
             }}>
-              {userAppointments.length} Appointment{userAppointments.length !== 1 ? 's' : ''}
+              {appointmentCount} Appointment{appointmentCount === 1 ? '' : 's'}
             </span>
           )}
-          <Button 
-            variant="primary"
-            icon={CalendarIcon}
-            onClick={goToToday}
-          >
+          <Button variant="primary" icon={CalendarIcon} onClick={goToToday}>
             Today
           </Button>
         </div>
       </div>
 
-      {/* Loading State */}
       {loading && (
         <Card style={{ padding: '2rem', textAlign: 'center' }}>
           <p>Loading appointments...</p>
         </Card>
       )}
 
-      {/* Error State */}
       {error && (
-        <Card style={{ padding: '2rem', background: '#fee', border: '1px solid #fcc' }}>
-          <p style={{ color: '#c00' }}>Error loading appointments: {error}</p>
+        <Card style={{ padding: '2rem', background: '#fee2e2', border: '1px solid #fca5a5' }}>
+          <p style={{ color: '#b91c1c', margin: 0 }}>Error loading appointments: {error}</p>
         </Card>
       )}
 
-      {/* No Appointments Message */}
-      {!loading && !error && userAppointments && userAppointments.length === 0 && (
+      {!loading && !error && userAppointments?.length === 0 && (
         <Card style={{ padding: '2rem', textAlign: 'center', marginBottom: '1rem' }}>
-          <p>
-            {isStaff 
-              ? 'No appointments have been scheduled yet. Students can book appointments from the Appointments page.'
-              : 'No appointments scheduled yet. Book an appointment to see it here!'}
+          <p style={{ margin: 0, color: '#6B7280' }}>
+            {isStaff
+              ? 'No appointments have been scheduled yet.'
+              : 'No appointments scheduled yet. Book one to see it here!'}
           </p>
         </Card>
       )}
 
-      {/* Calendar Controls */}
+      {/* Week navigation */}
       <Card className="calendar-controls">
         <button className="nav-btn" onClick={previousWeek} aria-label="Previous week">
-          <ChevronLeft size={24} />
+          <ChevronLeft size={18} />
         </button>
-        
+
         <div className="calendar-title">
           <h2>
-            {weekDays[0].toLocaleDateString('en-US', { 
-              month: 'long', 
-              year: 'numeric' 
-            })}
+            {weekDays[0].toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </h2>
           <p className="week-range">
-            {weekDays[0].toLocaleDateString('en-US', { 
-              month: 'short', 
-              day: 'numeric' 
-            })} - {' '}
-            {weekDays[6].toLocaleDateString('en-US', { 
-              month: 'short', 
-              day: 'numeric' 
-            })}
+            {weekDays[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            {' – '}
+            {weekDays[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
           </p>
         </div>
 
         <button className="nav-btn" onClick={nextWeek} aria-label="Next week">
-          <ChevronRight size={24} />
+          <ChevronRight size={18} />
         </button>
       </Card>
 
-      {/* Calendar Grid */}
+      {/* Calendar grid */}
       <Card className="calendar-container">
         <div className="calendar-grid">
-          {/* Header Row - Days */}
+
+          {/* Day headers */}
           <div className="calendar-header">
             <div className="time-column-header">Time</div>
-            {weekDays.map((day, index) => (
-              <div
-                key={index}
-                className={`day-header ${isToday(day) ? 'today' : ''} ${isSelected(day) ? 'selected' : ''}`}
+            {weekDays.map((day) => (
+              <button
+                key={formatDate(day)}
+                type="button"
+                className={`day-header${isToday(day) ? ' today' : ''}${isSelected(day) ? ' selected' : ''}`}
                 onClick={() => handleDateSelect(day)}
               >
                 <div className="day-name">
                   {day.toLocaleDateString('en-US', { weekday: 'short' })}
                 </div>
-                <div className="day-number">
-                  {day.getDate()}
-                </div>
-              </div>
+                <div className="day-number">{day.getDate()}</div>
+              </button>
             ))}
           </div>
 
-          {/* Time Slots Grid */}
+          {/* Time slot rows */}
           <div className="calendar-body">
-            {timeSlots.map((time, timeIndex) => (
-              <div key={timeIndex} className="time-row">
+            {timeSlots.map((time) => (
+              <div key={time} className="time-row">
                 <div className="time-cell">{time}</div>
-                {weekDays.map((day, dayIndex) => {
-                  const appointment = getAppointmentForSlot(day, time);
+                {weekDays.map((day) => {
+                  const slotAppointments = getAppointmentsForSlot(day, time);
                   return (
                     <div
-                      key={dayIndex}
-                      className={`slot-cell ${appointment ? 'has-appointment' : ''}`}
+                      key={formatDate(day)}
+                      className={`slot-cell${slotAppointments.length > 0 ? ' has-appointment' : ''}`}
                     >
-                      {appointment && (
-                        <div 
-                          className={`appointment-block ${(appointment.status || 'scheduled').toLowerCase()}`}
-                          title={`${isStaff ? `Student: ${appointment.studentId || 'Unknown'}\n` : ''}Status: ${appointment.status}\nReason: ${appointment.reason || 'N/A'}\nTime: ${(appointment.scheduledTime || appointment.time || '').substring(0, 5)}`}
-                        >
-                          <div className="appointment-time">
-                            {(appointment.scheduledTime || appointment.time || '').substring(0, 5)}
-                          </div>
-                          <div className="appointment-student">
-                            {isStaff 
-                              ? (appointment.user?.schoolId || appointment.studentId || 'Unknown Student') 
-                              : (appointment.reason || 'Appointment')}
-                          </div>
-                          <div className="appointment-concern">
-                            {isStaff 
-                              ? (appointment.reason || 'Medical Appointment')
-                              : `${appointment.location || 'Clinic'}`}
-                          </div>
-                          {isStaff && appointment.notes && (
-                            <div className="appointment-notes" style={{ fontSize: '0.75rem', marginTop: '0.25rem', opacity: 0.8 }}>
-                              {appointment.notes.substring(0, 30)}{appointment.notes.length > 30 ? '...' : ''}
+                      {slotAppointments.map((apt) => {
+                        const status = (apt.status ?? 'scheduled').toLowerCase();
+                        const aptTime = String(apt.scheduledTime ?? apt.time ?? '').substring(0, 5);
+                        const studentLine = isStaff ? `Student: ${apt.studentId ?? 'Unknown'}\n` : '';
+                        const tooltipText = `${studentLine}Status: ${apt.status ?? ''}\nReason: ${apt.reason ?? 'N/A'}\nTime: ${aptTime}`;
+                        return (
+                          <div
+                            key={apt.appointmentId}
+                            className={`appointment-block ${status}`}
+                            title={tooltipText}
+                          >
+                            <div className="appointment-time">{aptTime}</div>
+                            <div className="appointment-student">
+                              {isStaff
+                                ? (apt.user?.schoolId ?? apt.studentId ?? 'Unknown Student')
+                                : (apt.reason ?? 'Appointment')}
                             </div>
-                          )}
-                        </div>
-                      )}
+                            <div className="appointment-concern">
+                              {isStaff
+                                ? (apt.reason ?? 'Medical Appointment')
+                                : (apt.location ?? 'Clinic')}
+                            </div>
+                            {isStaff && apt.notes && (
+                              <div className="appointment-notes">
+                                {apt.notes.length > 30 ? `${apt.notes.substring(0, 30)}…` : apt.notes}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 })}
@@ -356,18 +268,19 @@ const Calendar = () => {
       <Card className="calendar-legend">
         <h3>Legend</h3>
         <div className="legend-items">
-          <div className="legend-item">
-            <div className="legend-color scheduled"></div>
-            <span>Scheduled</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-color completed"></div>
-            <span>Completed</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-color cancelled"></div>
-            <span>Cancelled</span>
-          </div>
+          {[
+            { status: 'scheduled',   label: 'Scheduled' },
+            { status: 'confirmed',   label: 'Confirmed' },
+            { status: 'completed',   label: 'Completed' },
+            { status: 'rescheduled', label: 'Rescheduled' },
+            { status: 'cancelled',   label: 'Cancelled' },
+            { status: 'pending',     label: 'Pending' },
+          ].map(({ status, label }) => (
+            <div key={status} className="legend-item">
+              <div className={`legend-color ${status}`} />
+              <span>{label}</span>
+            </div>
+          ))}
         </div>
       </Card>
     </div>
