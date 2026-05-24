@@ -5,7 +5,7 @@ import { NotificationProvider } from './context/NotificationContext';
 import { AuditLogProvider } from './context/AuditLogContext';
 import { AppointmentProvider } from './context/AppointmentContext';
 import Layout from './components/common/layout/Layout';
-import Landing from './pages/Landing';
+import Landing from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Appointments from './pages/Appointments';
 import Notifications from './pages/Notifications';
