@@ -183,9 +183,16 @@ export const AppointmentProvider = ({ children }) => {
   // Get user's appointments
   const userAppointments = useMemo(() => {
     if (!user) return [];
-    if (isStaffOrAdmin(user?.role)) return appointments;
-    const currentStudentId = user.userId || user.schoolId;
-    return appointments.filter(apt => apt.studentId === currentStudentId);
+    let filtered = appointments;
+    if (!isStaffOrAdmin(user?.role)) {
+      const currentStudentId = user.userId || user.schoolId;
+      filtered = appointments.filter(apt => apt.studentId === currentStudentId);
+    }
+    return filtered.sort((a, b) => {
+      const dateA = new Date(`${a.scheduledDate || a.date}T${a.scheduledTime || a.time}`);
+      const dateB = new Date(`${b.scheduledDate || b.date}T${b.scheduledTime || b.time}`);
+      return dateB - dateA;
+    });
   }, [appointments, user]);
   
   // Get upcoming appointments

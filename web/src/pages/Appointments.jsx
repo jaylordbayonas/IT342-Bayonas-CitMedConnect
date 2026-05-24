@@ -33,10 +33,10 @@ const Appointments = () => {
   const userIsStaff = userRole === 'staff' || userIsAdmin;
   const canManageSlots = userIsAdmin;
   const { logAction } = useAuditLog();
-  const { 
-    appointments: userAppointments = [], 
-    loading, 
-    bookAppointment, 
+  const {
+    userAppointments = [],
+    loading,
+    bookAppointment,
     cancelAppointment,
     successAppointment,
     rescheduleAppointment,
