@@ -35,7 +35,7 @@ class AuthViewModel : ViewModel() {
             try {
                 val response = repository.login(email, password)
                 _loginResult.value = if (response.success) {
-                    AuthResult(success = true, message = response.message, user = response.user)
+                    AuthResult(success = true, message = response.message, token = response.token, user = response.user)
                 } else {
                     AuthResult(success = false, message = response.message ?: "Login failed")
                 }
@@ -56,14 +56,18 @@ class AuthViewModel : ViewModel() {
         gender: String,
         age: String,
         password: String,
-        confirmPassword: String,
-        role: String
+        confirmPassword: String
     ) {
+        val role = "student"
         val ageInt = age.trim().toIntOrNull()
 
         when {
             schoolId.isBlank() -> {
-                _registerResult.value = AuthResult(success = false, message = "Please enter your Student / Staff ID")
+                _registerResult.value = AuthResult(success = false, message = "Please enter your Student ID")
+                return
+            }
+            !isValidSchoolId(schoolId.trim()) -> {
+                _registerResult.value = AuthResult(success = false, message = "Student ID must follow the format: ##-####-### (e.g. 21-1234-567)")
                 return
             }
             firstName.isBlank() -> {
@@ -134,10 +138,15 @@ class AuthViewModel : ViewModel() {
     private fun isValidCitEmail(email: String): Boolean {
         return email.trim().matches(Regex("^[a-zA-Z]+\\.[a-zA-Z]+@cit\\.edu$"))
     }
+
+    private fun isValidSchoolId(id: String): Boolean {
+        return id.matches(Regex("^\\d{2}-\\d{4}-\\d{3}$"))
+    }
 }
 
 data class AuthResult(
     val success: Boolean,
     val message: String,
+    val token: String? = null,
     val user: UserData? = null
 )

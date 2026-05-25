@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp \"c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/web/public/images/MascotCit.png\" \"c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/mobile/app/src/main/res/drawable/mascot_cit.png\")",
+      "Bash(cp \"c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/web/public/images/logo.jpg\" \"c:/Users/JAYLORD/OneDrive/Desktop/IT342-Bayonas-CitMedConnect/mobile/app/src/main/res/drawable/logo_image.jpg\")"
+    ]
+  }
+}

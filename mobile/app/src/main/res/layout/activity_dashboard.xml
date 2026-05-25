@@ -110,6 +110,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
+                        android:id="@+id/heroSubtitleText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Book appointments, view your medical history, and stay connected with our healthcare team."
@@ -138,6 +139,7 @@
                             android:layout_marginEnd="6dp" />
 
                         <TextView
+                            android:id="@+id/bookAppointmentBtnText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Book Appointment"
@@ -210,6 +212,7 @@
                                     android:textStyle="bold"
                                     android:textColor="#212121" />
                                 <TextView
+                                    android:id="@+id/stat1Label"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="My Appointments"
@@ -271,6 +274,7 @@
                                     android:textStyle="bold"
                                     android:textColor="#212121" />
                                 <TextView
+                                    android:id="@+id/stat2Label"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Upcoming"
@@ -340,12 +344,14 @@
                                     android:textStyle="bold"
                                     android:textColor="#212121" />
                                 <TextView
+                                    android:id="@+id/stat3Label"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Completed"
                                     android:textSize="11sp"
                                     android:textColor="#757575" />
                                 <TextView
+                                    android:id="@+id/stat3Trend"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="All time"
@@ -400,6 +406,7 @@
                                     android:textStyle="bold"
                                     android:textColor="#212121" />
                                 <TextView
+                                    android:id="@+id/stat4Label"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Notifications"
@@ -449,6 +456,7 @@
                         android:layout_marginEnd="10dp" />
 
                     <TextView
+                        android:id="@+id/recentSectionLabel"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

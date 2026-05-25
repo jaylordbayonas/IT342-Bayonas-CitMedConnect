@@ -44,6 +44,13 @@ android {
     }
 }
 
+// hamcrest:2.2 is the unified jar that supersedes hamcrest-core + hamcrest-library.
+// Exclude the old split jars globally so they don't clash.
+configurations.all {
+    exclude group: 'org.hamcrest', module: 'hamcrest-core'
+    exclude group: 'org.hamcrest', module: 'hamcrest-library'
+}
+
 dependencies {
     // AndroidX - Core Libraries
     implementation 'androidx.core:core:1.12.0'
@@ -90,7 +97,7 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.5.2'
     
     // Mockito for Android instrumentation tests
-    androidTestImplementation 'org.mockito.android:mockito-android:5.1.0'
+    androidTestImplementation 'org.mockito:mockito-android:5.8.0'
     
     // Hamcrest matchers for assertions
     testImplementation 'org.hamcrest:hamcrest:2.2'

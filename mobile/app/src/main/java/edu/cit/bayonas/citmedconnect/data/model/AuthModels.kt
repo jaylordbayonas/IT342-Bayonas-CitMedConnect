@@ -35,5 +35,6 @@ data class UserData(
     val id: String,
     val name: String,
     val email: String,
-    val schoolId: String? = null
+    val schoolId: String? = null,
+    val role: String? = null
 )

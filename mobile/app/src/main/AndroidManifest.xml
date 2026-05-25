@@ -41,12 +41,26 @@
         <activity
             android:name=".ui.DashboardActivity"
             android:exported="true"
-            android:theme="@style/Theme.CitMedConnect.Auth" />
+            android:theme="@style/Theme.CitMedConnect.Auth"
+            android:windowSoftInputMode="adjustPan" />
 
         <activity
             android:name=".ui.AppointmentsActivity"
             android:exported="true"
-            android:theme="@style/Theme.CitMedConnect.Auth" />
+            android:theme="@style/Theme.CitMedConnect.Auth"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.AdminAppointmentsActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CitMedConnect.Auth"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.ProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CitMedConnect.Auth"
+            android:windowSoftInputMode="adjustPan" />
 
     </application>
 
