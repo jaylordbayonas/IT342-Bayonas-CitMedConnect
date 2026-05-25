@@ -1,18 +1,18 @@
 package edu.cit.bayonas.citmedconnect.ui
 
+import android.app.DatePickerDialog
 import android.app.Dialog
+import android.app.TimePickerDialog
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
+import java.util.Calendar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.widget.EditText
-import android.widget.HorizontalScrollView
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -26,19 +26,19 @@ import edu.cit.bayonas.citmedconnect.data.model.AppointmentResponse
 import edu.cit.bayonas.citmedconnect.data.model.TimeSlotData
 import edu.cit.bayonas.citmedconnect.ui.viewmodel.AppointmentViewModel
 
-class AppointmentsActivity : AppCompatActivity() {
+class AdminAppointmentsActivity : AppCompatActivity() {
 
     private lateinit var viewModel: AppointmentViewModel
     private lateinit var searchInput: EditText
     private lateinit var filterAll: TextView
     private lateinit var filterScheduled: TextView
     private lateinit var filterCompleted: TextView
+    private lateinit var filterSuccess: TextView
     private lateinit var filterCancelled: TextView
     private lateinit var appointmentsListContainer: LinearLayout
     private lateinit var emptyStateContainer: LinearLayout
     private lateinit var emptySubtitle: TextView
-    private lateinit var bookAppointmentBtn: LinearLayout
-    private lateinit var emptyBookBtn: LinearLayout
+    private lateinit var manageSlotsBtn: LinearLayout
     private lateinit var navHome: LinearLayout
     private lateinit var navAppointments: LinearLayout
     private lateinit var navMedicalRecords: LinearLayout
@@ -52,7 +52,7 @@ class AppointmentsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = getColor(R.color.primary_red)
-        setContentView(R.layout.activity_appointments)
+        setContentView(R.layout.activity_admin_appointments)
 
         viewModel = ViewModelProvider(this).get(AppointmentViewModel::class.java)
 
@@ -61,29 +61,25 @@ class AppointmentsActivity : AppCompatActivity() {
         setupSearch()
         setupNavigation()
         observeViewModel()
-        viewModel.fetchMyAppointments()
-
-        if (intent.getBooleanExtra("OPEN_BOOKING_MODAL", false)) {
-            showBookAppointmentModal()
-        }
+        viewModel.fetchAllAppointments()
     }
 
     private fun bindViews() {
-        searchInput              = findViewById(R.id.searchInput)
-        filterAll                = findViewById(R.id.filterAll)
-        filterScheduled          = findViewById(R.id.filterScheduled)
-        filterCompleted          = findViewById(R.id.filterCompleted)
-        filterCancelled          = findViewById(R.id.filterCancelled)
+        searchInput               = findViewById(R.id.searchInput)
+        filterAll                 = findViewById(R.id.filterAll)
+        filterScheduled           = findViewById(R.id.filterScheduled)
+        filterCompleted           = findViewById(R.id.filterCompleted)
+        filterSuccess             = findViewById(R.id.filterSuccess)
+        filterCancelled           = findViewById(R.id.filterCancelled)
         appointmentsListContainer = findViewById(R.id.appointmentsListContainer)
-        emptyStateContainer      = findViewById(R.id.emptyStateContainer)
-        emptySubtitle            = findViewById(R.id.emptySubtitle)
-        bookAppointmentBtn       = findViewById(R.id.bookAppointmentBtn)
-        emptyBookBtn             = findViewById(R.id.emptyBookBtn)
-        navHome                  = findViewById(R.id.navHome)
-        navAppointments          = findViewById(R.id.navAppointments)
-        navMedicalRecords        = findViewById(R.id.navMedicalRecords)
-        navNotifications         = findViewById(R.id.navNotifications)
-        navProfile               = findViewById(R.id.navProfile)
+        emptyStateContainer       = findViewById(R.id.emptyStateContainer)
+        emptySubtitle             = findViewById(R.id.emptySubtitle)
+        manageSlotsBtn            = findViewById(R.id.manageSlotsBtn)
+        navHome                   = findViewById(R.id.navHome)
+        navAppointments           = findViewById(R.id.navAppointments)
+        navMedicalRecords         = findViewById(R.id.navMedicalRecords)
+        navNotifications          = findViewById(R.id.navNotifications)
+        navProfile                = findViewById(R.id.navProfile)
     }
 
     private fun observeViewModel() {
@@ -107,8 +103,11 @@ class AppointmentsActivity : AppCompatActivity() {
 
     private fun setupFilterChips() {
         val chips = listOf(
-            filterAll to "All", filterScheduled to "Scheduled",
-            filterCompleted to "Completed", filterCancelled to "Cancelled"
+            filterAll to "All",
+            filterScheduled to "Scheduled",
+            filterCompleted to "Completed",
+            filterSuccess to "Success",
+            filterCancelled to "Cancelled"
         )
         chips.forEach { (chip, label) ->
             chip.setOnClickListener {
@@ -120,7 +119,7 @@ class AppointmentsActivity : AppCompatActivity() {
     }
 
     private fun updateChipStyles(activeChip: TextView) {
-        listOf(filterAll, filterScheduled, filterCompleted, filterCancelled).forEach { chip ->
+        listOf(filterAll, filterScheduled, filterCompleted, filterSuccess, filterCancelled).forEach { chip ->
             if (chip == activeChip) {
                 chip.setBackgroundResource(R.drawable.filter_chip_active_bg)
                 chip.setTextColor(0xFFFFFFFF.toInt())
@@ -161,8 +160,7 @@ class AppointmentsActivity : AppCompatActivity() {
             startActivity(Intent(this, ProfileActivity::class.java))
             overridePendingTransition(0, 0)
         }
-        bookAppointmentBtn.setOnClickListener { showBookAppointmentModal() }
-        emptyBookBtn.setOnClickListener { showBookAppointmentModal() }
+        manageSlotsBtn.setOnClickListener { showManageSlotsDialog() }
     }
 
     private fun renderAppointments() {
@@ -173,6 +171,8 @@ class AppointmentsActivity : AppCompatActivity() {
                     appt.displayStatus.equals(currentFilter, ignoreCase = true)
             val matchesSearch = currentSearch.isEmpty() ||
                     (appt.reason?.contains(currentSearch, ignoreCase = true) == true) ||
+                    (appt.user?.schoolId?.contains(currentSearch, ignoreCase = true) == true) ||
+                    (appt.user?.fullName?.contains(currentSearch, ignoreCase = true) == true) ||
                     (appt.timeSlot?.displayLocation?.contains(currentSearch, ignoreCase = true) == true)
             matchesFilter && matchesSearch
         }
@@ -183,7 +183,7 @@ class AppointmentsActivity : AppCompatActivity() {
             emptySubtitle.text = if (currentSearch.isNotEmpty() || currentFilter != "All") {
                 "No appointments match your current filter or search."
             } else {
-                "Book an appointment to get started with your healthcare journey."
+                "No appointments have been booked yet."
             }
         } else {
             appointmentsListContainer.visibility = View.VISIBLE
@@ -194,17 +194,20 @@ class AppointmentsActivity : AppCompatActivity() {
 
     private fun addAppointmentCard(item: AppointmentResponse) {
         val view = LayoutInflater.from(this).inflate(
-            R.layout.item_appointment_full_card, appointmentsListContainer, false
+            R.layout.item_admin_appointment_card, appointmentsListContainer, false
         )
 
         view.findViewById<TextView>(R.id.appointmentReason).text   = item.reason ?: "—"
+        view.findViewById<TextView>(R.id.appointmentUserId).text   = item.user?.schoolId ?: "—"
+        view.findViewById<TextView>(R.id.appointmentUserName).text  = item.user?.fullName ?: "—"
         view.findViewById<TextView>(R.id.appointmentDateTime).text  = item.displayDateTime
         view.findViewById<TextView>(R.id.appointmentLocation).text  = item.timeSlot?.displayLocation ?: "Main Clinic"
 
         val statusBadge  = view.findViewById<TextView>(R.id.statusBadge)
         val statusAccent = view.findViewById<View>(R.id.statusAccent)
-        val btnEdit      = view.findViewById<LinearLayout>(R.id.btnEdit)
-        val btnDelete    = view.findViewById<LinearLayout>(R.id.btnDelete)
+        val btnComplete  = view.findViewById<LinearLayout>(R.id.btnComplete)
+        val btnReschedule = view.findViewById<LinearLayout>(R.id.btnReschedule)
+        val btnCancel    = view.findViewById<LinearLayout>(R.id.btnCancel)
 
         statusBadge.text = item.displayStatus
         when (item.displayStatus.lowercase()) {
@@ -212,13 +215,19 @@ class AppointmentsActivity : AppCompatActivity() {
                 statusBadge.setBackgroundResource(R.drawable.badge_scheduled_bg)
                 statusBadge.setTextColor(0xFF2196F3.toInt())
                 statusAccent.setBackgroundColor(0xFF2196F3.toInt())
-                btnEdit.visibility   = View.VISIBLE
-                btnDelete.visibility = View.VISIBLE
+                btnComplete.visibility   = View.VISIBLE
+                btnReschedule.visibility = View.VISIBLE
+                btnCancel.visibility     = View.VISIBLE
             }
             "completed" -> {
                 statusBadge.setBackgroundResource(R.drawable.badge_completed_bg)
                 statusBadge.setTextColor(0xFF4CAF50.toInt())
                 statusAccent.setBackgroundColor(0xFF4CAF50.toInt())
+            }
+            "success" -> {
+                statusBadge.setBackgroundResource(R.drawable.badge_success_bg)
+                statusBadge.setTextColor(0xFF00897B.toInt())
+                statusAccent.setBackgroundColor(0xFF00897B.toInt())
             }
             "cancelled" -> {
                 statusBadge.setBackgroundResource(R.drawable.badge_cancelled_bg)
@@ -233,18 +242,28 @@ class AppointmentsActivity : AppCompatActivity() {
         }
 
         view.findViewById<LinearLayout>(R.id.btnView).setOnClickListener {
-            showDetailsDialog(item)
+            showAppointmentDetailsDialog(item)
         }
-        btnEdit.setOnClickListener {
+        btnComplete.setOnClickListener {
+            item.appointmentId?.let { id ->
+                showConfirmDialog(
+                    title        = "Mark as Complete",
+                    message      = "Mark \"${item.reason}\" by ${item.user?.fullName} as completed?",
+                    confirmLabel = "Mark Complete",
+                    onConfirm    = { viewModel.completeAppointment(id, isAdmin = true) }
+                )
+            }
+        }
+        btnReschedule.setOnClickListener {
             Toast.makeText(this, "Reschedule coming soon", Toast.LENGTH_SHORT).show()
         }
-        btnDelete.setOnClickListener {
+        btnCancel.setOnClickListener {
             item.appointmentId?.let { id ->
                 showConfirmDialog(
                     title        = "Cancel Appointment",
-                    message      = "Cancel \"${item.reason}\"? This cannot be undone.",
+                    message      = "Cancel \"${item.reason}\" by ${item.user?.fullName}? This cannot be undone.",
                     confirmLabel = "Cancel Appointment",
-                    onConfirm    = { viewModel.cancelAppointment(id) }
+                    onConfirm    = { viewModel.cancelAppointment(id, isAdmin = true) }
                 )
             }
         }
@@ -253,10 +272,10 @@ class AppointmentsActivity : AppCompatActivity() {
     }
 
     // ================================================================
-    // DETAILS DIALOG
+    // APPOINTMENT DETAILS DIALOG
     // ================================================================
 
-    private fun showDetailsDialog(item: AppointmentResponse) {
+    private fun showAppointmentDetailsDialog(item: AppointmentResponse) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.apply {
@@ -320,6 +339,8 @@ class AppointmentsActivity : AppCompatActivity() {
                 .also { it.bottomMargin = (16*dp).toInt() }
         })
         root.addView(row("Reason / Symptoms", item.reason ?: "—"))
+        root.addView(row("Student ID", item.user?.schoolId ?: "—"))
+        root.addView(row("Student Name", item.user?.fullName ?: "—"))
         root.addView(row("Date & Time", item.displayDateTime))
         root.addView(row("Location", item.timeSlot?.displayLocation ?: "Main Clinic"))
         if (!item.notes.isNullOrBlank()) root.addView(row("Notes", item.notes))
@@ -331,7 +352,7 @@ class AppointmentsActivity : AppCompatActivity() {
     }
 
     // ================================================================
-    // CONFIRM DIALOG
+    // GENERIC CONFIRM DIALOG
     // ================================================================
 
     private fun showConfirmDialog(title: String, message: String, confirmLabel: String, onConfirm: () -> Unit) {
@@ -377,13 +398,13 @@ class AppointmentsActivity : AppCompatActivity() {
     }
 
     // ================================================================
-    // BOOK APPOINTMENT MODAL
+    // MANAGE SLOTS DIALOG
     // ================================================================
 
-    private fun showBookAppointmentModal() {
+    private fun showManageSlotsDialog() {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_book_appointment)
+        dialog.setContentView(R.layout.dialog_manage_slots)
         dialog.window?.apply {
             setBackgroundDrawableResource(android.R.color.transparent)
             setLayout(
@@ -394,179 +415,108 @@ class AppointmentsActivity : AppCompatActivity() {
         }
         dialog.setCanceledOnTouchOutside(true)
 
-        val closeBtn       = dialog.findViewById<LinearLayout>(R.id.closeBtn)
-        val slotsContainer = dialog.findViewById<LinearLayout>(R.id.slotsContainer)
-        val emptySlots     = dialog.findViewById<LinearLayout>(R.id.emptySlots)
-        val confirmBtn     = dialog.findViewById<LinearLayout>(R.id.confirmBtn)
-        val confirmBtnText = dialog.findViewById<TextView>(R.id.confirmBtnText)
-        val scrollView     = dialog.findViewById<ScrollView>(R.id.slotsScrollView)
-        val reasonInput    = dialog.findViewById<EditText>(R.id.reasonInput)
-        val symptomsInput  = dialog.findViewById<EditText>(R.id.symptomsInput)
+        val scrollView           = dialog.findViewById<ScrollView>(R.id.manageSlotsScrollView)
+        scrollView.layoutParams.height = (resources.displayMetrics.heightPixels * 0.75).toInt()
 
-        scrollView.layoutParams.height = (resources.displayMetrics.heightPixels * 0.42).toInt()
+        val closeBtn             = dialog.findViewById<LinearLayout>(R.id.closeBtn)
+        val slotDateInput        = dialog.findViewById<EditText>(R.id.slotDateInput)
+        val slotStartTimeInput   = dialog.findViewById<EditText>(R.id.slotStartTimeInput)
+        val slotEndTimeInput     = dialog.findViewById<EditText>(R.id.slotEndTimeInput)
+        val slotMaxBookingsInput = dialog.findViewById<EditText>(R.id.slotMaxBookingsInput)
+        val addSlotBtn           = dialog.findViewById<LinearLayout>(R.id.addSlotBtn)
+        val manageSlotsContainer = dialog.findViewById<LinearLayout>(R.id.manageSlotsContainer)
+        val emptyManagedSlots    = dialog.findViewById<LinearLayout>(R.id.emptyManagedSlots)
+        val slotCountText        = dialog.findViewById<TextView>(R.id.slotCountText)
 
         closeBtn.setOnClickListener { dialog.dismiss() }
 
-        var selectedSlot: TimeSlotData? = null
-        val slotViewMap = mutableMapOf<TimeSlotData, LinearLayout>()
+        slotDateInput.setOnClickListener {
+            val cal = Calendar.getInstance()
+            DatePickerDialog(this, { _, year, month, day ->
+                slotDateInput.setText(String.format("%04d-%02d-%02d", year, month + 1, day))
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+        }
+        slotStartTimeInput.setOnClickListener {
+            val cal = Calendar.getInstance()
+            TimePickerDialog(this, { _, hour, minute ->
+                slotStartTimeInput.setText(String.format("%02d:%02d", hour, minute))
+            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+        }
+        slotEndTimeInput.setOnClickListener {
+            val cal = Calendar.getInstance()
+            TimePickerDialog(this, { _, hour, minute ->
+                slotEndTimeInput.setText(String.format("%02d:%02d", hour, minute))
+            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+        }
 
-        fun refreshSlots(slots: List<TimeSlotData>) {
-            slotsContainer.removeAllViews()
-            slotViewMap.clear()
-            val today = java.time.LocalDate.now()
-            val bookable = slots.filter { slot ->
-                if (!slot.isBookable) return@filter false
-                val date = runCatching { java.time.LocalDate.parse(slot.slotDate ?: "") }.getOrNull()
-                date == null || !date.isBefore(today)
-            }
-            if (bookable.isEmpty()) {
-                slotsContainer.visibility = View.GONE
-                emptySlots.visibility     = View.VISIBLE
-                confirmBtn.alpha    = 0.45f
-                confirmBtn.isEnabled = false
+        fun refreshSlotsList(slots: List<TimeSlotData>) {
+            manageSlotsContainer.removeAllViews()
+            slotCountText.text = "Available Slots (${slots.size})"
+            if (slots.isEmpty()) {
+                emptyManagedSlots.visibility    = View.VISIBLE
+                manageSlotsContainer.visibility = View.GONE
             } else {
-                slotsContainer.visibility = View.VISIBLE
-                emptySlots.visibility     = View.GONE
-                populateSlots(slotsContainer, bookable, slotViewMap) { slot ->
-                    selectedSlot = slot
-                    slotViewMap.forEach { (_, v) -> setSlotUnselected(v) }
-                    setSlotSelected(slotViewMap[slot]!!)
-                    confirmBtn.animate().alpha(1f).setDuration(160).start()
-                    confirmBtnText.text = "Review Booking →"
-                }
+                emptyManagedSlots.visibility    = View.GONE
+                manageSlotsContainer.visibility = View.VISIBLE
+                slots.forEach { slot -> addManagedSlotItem(manageSlotsContainer, slot) }
             }
         }
 
         val slotsObserver = Observer<List<TimeSlotData>> { slots ->
-            if (dialog.isShowing) refreshSlots(slots)
+            if (dialog.isShowing) refreshSlotsList(slots)
         }
         viewModel.slots.observe(this, slotsObserver)
-        viewModel.fetchAvailableSlots()
+        viewModel.fetchAllSlots()
 
         dialog.setOnDismissListener { viewModel.slots.removeObserver(slotsObserver) }
 
-        confirmBtn.setOnClickListener {
-            val slot = selectedSlot ?: return@setOnClickListener
-            val reason = reasonInput.text?.toString()?.trim() ?: ""
-            if (reason.isEmpty()) {
-                reasonInput.error = "Please describe your reason for visiting"
+        addSlotBtn.setOnClickListener {
+            val date        = slotDateInput.text.toString().trim()
+            val startTime   = slotStartTimeInput.text.toString().trim()
+            val endTime     = slotEndTimeInput.text.toString().trim()
+            val maxBookings = slotMaxBookingsInput.text.toString().trim().toIntOrNull() ?: 1
+
+            if (date.isEmpty() || startTime.isEmpty()) {
+                Toast.makeText(this, "Date and Start Time are required", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val symptoms = symptomsInput.text?.toString()?.trim() ?: ""
-            showBookingConfirmationDialog(dialog, slot, reason, symptoms)
+
+            val staffId = SessionManager.userId(this) ?: ""
+            viewModel.createTimeSlot(date, startTime, endTime, maxBookings, staffId)
+            slotDateInput.text.clear()
+            slotStartTimeInput.text.clear()
+            slotEndTimeInput.text.clear()
+            slotMaxBookingsInput.setText("1")
         }
 
         dialog.show()
     }
 
-    private fun showBookingConfirmationDialog(
-        bookingDialog: Dialog,
-        slot: TimeSlotData,
-        reason: String,
-        symptoms: String
-    ) {
-        val confirmDialog = Dialog(this)
-        confirmDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        confirmDialog.setContentView(R.layout.dialog_booking_confirmation)
-        confirmDialog.window?.apply {
-            setBackgroundDrawableResource(android.R.color.transparent)
-            setLayout(
-                (resources.displayMetrics.widthPixels * 0.92).toInt(),
-                android.view.WindowManager.LayoutParams.WRAP_CONTENT
-            )
-            setGravity(Gravity.CENTER)
-        }
-        confirmDialog.setCanceledOnTouchOutside(false)
+    private fun addManagedSlotItem(container: LinearLayout, slot: TimeSlotData) {
+        val view = LayoutInflater.from(this).inflate(R.layout.item_slot_manage_card, container, false)
 
-        confirmDialog.findViewById<LinearLayout>(R.id.closeBtn).setOnClickListener { confirmDialog.dismiss() }
-        confirmDialog.findViewById<TextView>(R.id.confirmDate).text = formatSlotDate(slot.slotDate ?: "")
-        confirmDialog.findViewById<TextView>(R.id.confirmTime).text = slot.displayTime
-        confirmDialog.findViewById<TextView>(R.id.confirmLocation).text = slot.displayLocation
-        confirmDialog.findViewById<TextView>(R.id.confirmReason).text = reason
-        confirmDialog.findViewById<TextView>(R.id.confirmSymptoms).text =
-            if (symptoms.isEmpty()) "None specified" else symptoms
+        val endDisplay = if (!slot.endTime.isNullOrEmpty()) " – ${slot.endTime.take(5)}" else ""
+        val timeDisplay = "${slot.slotDate} · ${slot.startTime?.take(5) ?: ""}$endDisplay"
+        val bookedStatus = slot.bookedStatus
+        val statusDisplay = "${slot.displayLocation} · $bookedStatus (${slot.currentBookings ?: 0}/${slot.maxBookings ?: 1})"
 
-        confirmDialog.findViewById<LinearLayout>(R.id.backBtn).setOnClickListener {
-            confirmDialog.dismiss()
+        view.findViewById<TextView>(R.id.slotManageDateTime).text = timeDisplay
+        view.findViewById<TextView>(R.id.slotManageStatus).text   = statusDisplay
+
+        view.findViewById<LinearLayout>(R.id.btnSlotEdit).setOnClickListener {
+            Toast.makeText(this, "Edit slot coming soon", Toast.LENGTH_SHORT).show()
         }
-        confirmDialog.findViewById<LinearLayout>(R.id.confirmBookingBtn).setOnClickListener {
-            val studentId = SessionManager.schoolId(this) ?: SessionManager.userId(this) ?: ""
+        view.findViewById<LinearLayout>(R.id.btnSlotDelete).setOnClickListener {
             slot.timeSlotId?.let { id ->
-                viewModel.bookAppointment(id, studentId, reason, symptoms)
-                confirmDialog.dismiss()
-                bookingDialog.dismiss()
-            }
-        }
-
-        confirmDialog.show()
-    }
-
-    private fun populateSlots(
-        container: LinearLayout,
-        slots: List<TimeSlotData>,
-        viewMap: MutableMap<TimeSlotData, LinearLayout>,
-        onSelect: (TimeSlotData) -> Unit
-    ) {
-        val dp = resources.displayMetrics.density
-        slots.groupBy { it.slotDate ?: "" }.forEach { (date, dateSlots) ->
-            container.addView(TextView(this).apply {
-                text = formatSlotDate(date); textSize = 13f
-                setTextColor(getColor(R.color.primary_red))
-                setTypeface(null, android.graphics.Typeface.BOLD)
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                ).also { it.bottomMargin = (10*dp).toInt() }
-            })
-            container.addView(View(this).apply {
-                setBackgroundColor(0xFFF0F0F0.toInt())
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, (1*dp).toInt()
-                ).also { it.bottomMargin = (12*dp).toInt() }
-            })
-
-            val hScroll = HorizontalScrollView(this).apply {
-                isHorizontalScrollBarEnabled = false
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                ).also { it.bottomMargin = (20*dp).toInt() }
-            }
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                showConfirmDialog(
+                    title        = "Delete Time Slot",
+                    message      = "Delete the slot on ${slot.slotDate} at ${slot.startTime?.take(5)}? Students won't be able to book it.",
+                    confirmLabel = "Delete Slot",
+                    onConfirm    = { viewModel.deleteTimeSlot(id) }
                 )
             }
-            dateSlots.forEach { slot ->
-                val card = LayoutInflater.from(this).inflate(R.layout.item_timeslot_card, row, false) as LinearLayout
-                card.findViewById<TextView>(R.id.slotTime).text     = slot.displayTime
-                card.findViewById<TextView>(R.id.slotLocation).text = slot.displayLocation
-                viewMap[slot] = card
-                card.setOnClickListener { onSelect(slot) }
-                row.addView(card)
-            }
-            hScroll.addView(row)
-            container.addView(hScroll)
         }
-    }
 
-    private fun formatSlotDate(dateStr: String): String {
-        return try {
-            val date = java.time.LocalDate.parse(dateStr)
-            date.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy"))
-        } catch (e: Exception) { dateStr }
-    }
-
-    private fun setSlotSelected(view: LinearLayout) {
-        view.setBackgroundResource(R.drawable.timeslot_card_selected_bg)
-        view.findViewById<TextView>(R.id.slotTime).setTextColor(0xFFFFFFFF.toInt())
-        view.findViewById<TextView>(R.id.slotLocation).setTextColor(0xCCFFFFFF.toInt())
-        view.findViewById<ImageView>(R.id.slotIcon).imageTintList = ColorStateList.valueOf(0xFFFFFFFF.toInt())
-    }
-
-    private fun setSlotUnselected(view: LinearLayout) {
-        view.setBackgroundResource(R.drawable.timeslot_card_normal_bg)
-        view.findViewById<TextView>(R.id.slotTime).setTextColor(0xFF212121.toInt())
-        view.findViewById<TextView>(R.id.slotLocation).setTextColor(0xFF9E9E9E.toInt())
-        view.findViewById<ImageView>(R.id.slotIcon).imageTintList = ColorStateList.valueOf(0xFF757575.toInt())
+        container.addView(view)
     }
 }

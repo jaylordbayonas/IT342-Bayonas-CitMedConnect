@@ -148,7 +148,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:hint="Student / Staff ID Number"
+                    android:hint="##-####-###"
                     android:inputType="number"
                     android:background="@android:color/transparent"
                     android:textColor="@color/text_primary"
@@ -361,37 +361,6 @@
                     android:textSize="14sp"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp" />
-            </LinearLayout>
-
-            <!-- Role spinner -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:orientation="horizontal"
-                android:background="@drawable/input_field_auth"
-                android:paddingStart="14dp"
-                android:paddingEnd="8dp"
-                android:layout_marginBottom="10dp"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_marginEnd="12dp"
-                    android:src="@drawable/ic_user"
-                    android:tint="@color/icon_color"
-                    android:contentDescription="Role icon" />
-
-                <Spinner
-                    android:id="@+id/roleSpinner"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:popupBackground="@color/white"
-                    android:spinnerMode="dropdown"
-                    android:prompt="@string/role_prompt"
-                    android:entries="@array/role_options" />
             </LinearLayout>
 
             <!-- ── SECTION LABEL: Security ── -->

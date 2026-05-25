@@ -29,7 +29,6 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var ageInput: EditText
     private lateinit var emailInput: EditText
     private lateinit var phoneInput: EditText
-    private lateinit var roleSpinner: Spinner
     private lateinit var passwordInput: EditText
     private lateinit var confirmPasswordInput: EditText
     private lateinit var registerButton: Button
@@ -51,6 +50,7 @@ class RegisterActivity : AppCompatActivity() {
 
         bindViews()
         setupSpinners()
+        setupSchoolIdMask()
         setupPasswordToggles()
         setupClickListeners()
         observeViewModel()
@@ -64,7 +64,6 @@ class RegisterActivity : AppCompatActivity() {
         ageInput = findViewById(R.id.ageInput)
         emailInput = findViewById(R.id.emailInput)
         phoneInput = findViewById(R.id.phoneInput)
-        roleSpinner = findViewById(R.id.roleSpinner)
         passwordInput = findViewById(R.id.passwordInput)
         confirmPasswordInput = findViewById(R.id.confirmPasswordInput)
         registerButton = findViewById(R.id.registerButton)
@@ -81,10 +80,28 @@ class RegisterActivity : AppCompatActivity() {
         ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         genderSpinner.adapter = genderAdapter
 
-        val roleAdapter = ArrayAdapter.createFromResource(
-            this, R.array.role_options, android.R.layout.simple_spinner_item
-        ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
-        roleSpinner.adapter = roleAdapter
+    }
+
+    private fun setupSchoolIdMask() {
+        schoolIdInput.inputType = android.text.InputType.TYPE_CLASS_PHONE
+        var isFormatting = false
+        schoolIdInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (isFormatting || s == null) return
+                isFormatting = true
+                val digits = s.toString().filter { it.isDigit() }.take(9)
+                val result = buildString {
+                    digits.forEachIndexed { i, c ->
+                        if (i == 2 || i == 6) append('-')
+                        append(c)
+                    }
+                }
+                s.replace(0, s.length, result)
+                isFormatting = false
+            }
+        })
     }
 
     private fun setupPasswordToggles() {
@@ -123,8 +140,7 @@ class RegisterActivity : AppCompatActivity() {
                 gender = genderSpinner.selectedItem?.toString() ?: "",
                 age = ageInput.text.toString(),
                 password = passwordInput.text.toString(),
-                confirmPassword = confirmPasswordInput.text.toString(),
-                role = roleSpinner.selectedItem?.toString() ?: "Student"
+                confirmPassword = confirmPasswordInput.text.toString()
             )
         }
 

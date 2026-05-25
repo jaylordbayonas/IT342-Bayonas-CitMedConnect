@@ -8,20 +8,34 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import edu.cit.bayonas.citmedconnect.R
+import edu.cit.bayonas.citmedconnect.data.SessionManager
+import edu.cit.bayonas.citmedconnect.data.model.AppointmentResponse
+import edu.cit.bayonas.citmedconnect.ui.viewmodel.AppointmentViewModel
 import java.util.Calendar
 
 class DashboardActivity : AppCompatActivity() {
 
+    private lateinit var viewModel: AppointmentViewModel
+
     private lateinit var greetingText: TextView
     private lateinit var userNameText: TextView
+    private lateinit var heroSubtitleText: TextView
+    private lateinit var bookAppointmentBtnText: TextView
     private lateinit var stat1Value: TextView
     private lateinit var stat2Value: TextView
     private lateinit var stat3Value: TextView
     private lateinit var stat4Value: TextView
+    private lateinit var stat1Label: TextView
+    private lateinit var stat2Label: TextView
+    private lateinit var stat3Label: TextView
+    private lateinit var stat4Label: TextView
     private lateinit var stat1Trend: TextView
     private lateinit var stat2Trend: TextView
+    private lateinit var stat3Trend: TextView
     private lateinit var stat4Trend: TextView
+    private lateinit var recentSectionLabel: TextView
     private lateinit var appointmentsContainer: LinearLayout
     private lateinit var emptyState: LinearLayout
     private lateinit var bookAppointmentBtn: LinearLayout
@@ -39,33 +53,52 @@ class DashboardActivity : AppCompatActivity() {
         window.statusBarColor = getColor(R.color.primary_red)
         setContentView(R.layout.activity_dashboard)
 
+        viewModel = ViewModelProvider(this).get(AppointmentViewModel::class.java)
+        val isAdmin = SessionManager.isAdmin(this)
+
         bindViews()
         setupGreeting()
-        setupNavigation()
-        loadDashboardData()
+        adaptToRole(isAdmin)
+        setupNavigation(isAdmin)
+        observeViewModel(isAdmin)
+
+        if (isAdmin) {
+            viewModel.fetchAllAppointments()
+            viewModel.fetchAllSlots()
+        } else {
+            viewModel.fetchMyAppointments()
+        }
     }
 
     private fun bindViews() {
-        greetingText = findViewById(R.id.greetingText)
-        userNameText = findViewById(R.id.userNameText)
-        stat1Value = findViewById(R.id.stat1Value)
-        stat2Value = findViewById(R.id.stat2Value)
-        stat3Value = findViewById(R.id.stat3Value)
-        stat4Value = findViewById(R.id.stat4Value)
-        stat1Trend = findViewById(R.id.stat1Trend)
-        stat2Trend = findViewById(R.id.stat2Trend)
-        stat4Trend = findViewById(R.id.stat4Trend)
-        appointmentsContainer = findViewById(R.id.appointmentsContainer)
-        emptyState = findViewById(R.id.emptyState)
-        bookAppointmentBtn = findViewById(R.id.bookAppointmentBtn)
-        viewAllAppointments = findViewById(R.id.viewAllAppointments)
-        profileBtn = findViewById(R.id.profileBtn)
-        calendarBtn = findViewById(R.id.calendarBtn)
-        navHome = findViewById(R.id.navHome)
-        navAppointments = findViewById(R.id.navAppointments)
-        navMedicalRecords = findViewById(R.id.navMedicalRecords)
-        navNotifications = findViewById(R.id.navNotifications)
-        navProfile = findViewById(R.id.navProfile)
+        greetingText           = findViewById(R.id.greetingText)
+        userNameText           = findViewById(R.id.userNameText)
+        heroSubtitleText       = findViewById(R.id.heroSubtitleText)
+        bookAppointmentBtnText = findViewById(R.id.bookAppointmentBtnText)
+        stat1Value             = findViewById(R.id.stat1Value)
+        stat2Value             = findViewById(R.id.stat2Value)
+        stat3Value             = findViewById(R.id.stat3Value)
+        stat4Value             = findViewById(R.id.stat4Value)
+        stat1Label             = findViewById(R.id.stat1Label)
+        stat2Label             = findViewById(R.id.stat2Label)
+        stat3Label             = findViewById(R.id.stat3Label)
+        stat4Label             = findViewById(R.id.stat4Label)
+        stat1Trend             = findViewById(R.id.stat1Trend)
+        stat2Trend             = findViewById(R.id.stat2Trend)
+        stat3Trend             = findViewById(R.id.stat3Trend)
+        stat4Trend             = findViewById(R.id.stat4Trend)
+        recentSectionLabel     = findViewById(R.id.recentSectionLabel)
+        appointmentsContainer  = findViewById(R.id.appointmentsContainer)
+        emptyState             = findViewById(R.id.emptyState)
+        bookAppointmentBtn     = findViewById(R.id.bookAppointmentBtn)
+        viewAllAppointments    = findViewById(R.id.viewAllAppointments)
+        profileBtn             = findViewById(R.id.profileBtn)
+        calendarBtn            = findViewById(R.id.calendarBtn)
+        navHome                = findViewById(R.id.navHome)
+        navAppointments        = findViewById(R.id.navAppointments)
+        navMedicalRecords      = findViewById(R.id.navMedicalRecords)
+        navNotifications       = findViewById(R.id.navNotifications)
+        navProfile             = findViewById(R.id.navProfile)
     }
 
     private fun setupGreeting() {
@@ -73,107 +106,173 @@ class DashboardActivity : AppCompatActivity() {
         greetingText.text = when {
             hour < 12 -> "Good Morning,"
             hour < 18 -> "Good Afternoon,"
-            else -> "Good Evening,"
+            else      -> "Good Evening,"
         }
-        val userName = intent.getStringExtra("USER_NAME") ?: "User"
-        userNameText.text = userName
+        userNameText.text = intent.getStringExtra("USER_NAME")
+            ?: SessionManager.userName(this)
+            ?: "User"
     }
 
-    private fun setupNavigation() {
-        navHome.setOnClickListener { }
-
-        navAppointments.setOnClickListener {
-            startActivity(Intent(this, AppointmentsActivity::class.java))
+    private fun adaptToRole(isAdmin: Boolean) {
+        if (isAdmin) {
+            heroSubtitleText.text       = "Manage student appointments, time slots, and monitor clinic activity."
+            bookAppointmentBtnText.text = "Manage Slots"
+            stat1Label.text             = "Total Bookings"
+            stat2Label.text             = "Pending"
+            stat3Label.text             = "Available Slots"
+            stat4Label.text             = "Completed"
+            recentSectionLabel.text     = "Recent Appointments"
         }
+        // Reset stats to 0 while loading
+        stat1Value.text = "0"
+        stat2Value.text = "0"
+        stat3Value.text = "0"
+        stat4Value.text = "0"
+    }
 
+    private fun setupNavigation(isAdmin: Boolean) {
+        navHome.setOnClickListener { }
+        navAppointments.setOnClickListener {
+            if (isAdmin) {
+                startActivity(Intent(this, AdminAppointmentsActivity::class.java))
+            } else {
+                startActivity(Intent(this, AppointmentsActivity::class.java))
+            }
+            overridePendingTransition(0, 0)
+        }
         navMedicalRecords.setOnClickListener {
             Toast.makeText(this, "Medical Records coming soon", Toast.LENGTH_SHORT).show()
         }
-
         navNotifications.setOnClickListener {
             Toast.makeText(this, "Notifications coming soon", Toast.LENGTH_SHORT).show()
         }
-
         navProfile.setOnClickListener {
-            Toast.makeText(this, "Profile coming soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, ProfileActivity::class.java))
+            overridePendingTransition(0, 0)
         }
 
-        bookAppointmentBtn.setOnClickListener {
-            val intent = Intent(this, AppointmentsActivity::class.java)
-            intent.putExtra("OPEN_BOOKING_MODAL", true)
-            startActivity(intent)
+        if (isAdmin) {
+            bookAppointmentBtn.setOnClickListener {
+                startActivity(Intent(this, AdminAppointmentsActivity::class.java))
+                overridePendingTransition(0, 0)
+            }
+            calendarBtn.setOnClickListener {
+                startActivity(Intent(this, AdminAppointmentsActivity::class.java))
+                overridePendingTransition(0, 0)
+            }
+            viewAllAppointments.setOnClickListener {
+                startActivity(Intent(this, AdminAppointmentsActivity::class.java))
+                overridePendingTransition(0, 0)
+            }
+        } else {
+            bookAppointmentBtn.setOnClickListener {
+                val intent = Intent(this, AppointmentsActivity::class.java)
+                intent.putExtra("OPEN_BOOKING_MODAL", true)
+                startActivity(intent)
+            }
+            calendarBtn.setOnClickListener {
+                val intent = Intent(this, AppointmentsActivity::class.java)
+                intent.putExtra("OPEN_BOOKING_MODAL", true)
+                startActivity(intent)
+            }
+            viewAllAppointments.setOnClickListener {
+                startActivity(Intent(this, AppointmentsActivity::class.java))
+            }
         }
 
         profileBtn.setOnClickListener {
-            Toast.makeText(this, "Profile coming soon", Toast.LENGTH_SHORT).show()
-        }
-
-        calendarBtn.setOnClickListener {
-            val intent = Intent(this, AppointmentsActivity::class.java)
-            intent.putExtra("OPEN_BOOKING_MODAL", true)
-            startActivity(intent)
-        }
-
-        viewAllAppointments.setOnClickListener {
-            startActivity(Intent(this, AppointmentsActivity::class.java))
+            startActivity(Intent(this, ProfileActivity::class.java))
+            overridePendingTransition(0, 0)
         }
     }
 
-    private fun loadDashboardData() {
-        val sampleAppointments = listOf(
-            AppointmentItem("General Consultation", "Dr. Santos", "May 26, 2026 at 12:41", "Scheduled"),
-            AppointmentItem("Medical Check-up", "Dr. Santos", "May 28, 2026 at 10:00", "Pending")
-        )
+    private fun observeViewModel(isAdmin: Boolean) {
+        viewModel.appointments.observe(this) { appointments ->
+            if (isAdmin) {
+                updateAdminStats(appointments)
+            } else {
+                updateStudentStats(appointments)
+            }
+            populateRecentAppointments(appointments.take(5), isAdmin)
+        }
 
-        val total = sampleAppointments.size
-        val upcoming = sampleAppointments.count { it.status.equals("Scheduled", ignoreCase = true) || it.status.equals("Pending", ignoreCase = true) }
-        val completed = 3
+        if (isAdmin) {
+            viewModel.slots.observe(this) { slots ->
+                val available = slots.count { it.isBookable }
+                stat3Value.text = available.toString()
+                stat3Trend.text = if (available == 0) "None available" else "Bookable"
+            }
+        }
+    }
+
+    private fun updateStudentStats(appointments: List<AppointmentResponse>) {
+        val total     = appointments.size
+        val scheduled = appointments.count { it.displayStatus == "Scheduled" }
+        val completed = appointments.count { it.displayStatus == "Completed" }
 
         stat1Value.text = total.toString()
-        stat2Value.text = upcoming.toString()
+        stat2Value.text = scheduled.toString()
         stat3Value.text = completed.toString()
         stat4Value.text = "0"
-        stat1Trend.text = "$upcoming upcoming"
-        stat2Trend.text = "This week"
+        stat1Trend.text = if (scheduled > 0) "$scheduled upcoming" else "None upcoming"
+        stat2Trend.text = "Scheduled"
+        stat3Trend.text = "All time"
         stat4Trend.text = "None"
+    }
 
-        if (sampleAppointments.isEmpty()) {
+    private fun updateAdminStats(appointments: List<AppointmentResponse>) {
+        val total     = appointments.size
+        val pending   = appointments.count { it.displayStatus == "Scheduled" }
+        val completed = appointments.count { it.displayStatus == "Completed" }
+
+        stat1Value.text = total.toString()
+        stat2Value.text = pending.toString()
+        stat4Value.text = completed.toString()
+        stat1Trend.text = "All students"
+        stat2Trend.text = if (pending > 0) "Needs action" else "All clear"
+        stat4Trend.text = "Total"
+    }
+
+    private fun populateRecentAppointments(appointments: List<AppointmentResponse>, isAdmin: Boolean) {
+        appointmentsContainer.removeAllViews()
+        if (appointments.isEmpty()) {
             emptyState.visibility = View.VISIBLE
         } else {
-            sampleAppointments.forEach { addAppointmentItem(it) }
+            emptyState.visibility = View.GONE
+            appointments.forEach { appt ->
+                val secondaryLine = if (isAdmin) {
+                    appt.user?.fullName ?: "Student"
+                } else {
+                    appt.timeSlot?.displayLocation ?: "Main Clinic"
+                }
+                addAppointmentItem(
+                    reason   = appt.reason ?: "—",
+                    doctor   = secondaryLine,
+                    dateTime = appt.displayDateTime,
+                    status   = appt.displayStatus
+                )
+            }
         }
     }
 
-    private fun addAppointmentItem(item: AppointmentItem) {
+    private fun addAppointmentItem(reason: String, doctor: String, dateTime: String, status: String) {
         val view = LayoutInflater.from(this).inflate(
-            R.layout.item_appointment_dashboard,
-            appointmentsContainer,
-            false
+            R.layout.item_appointment_dashboard, appointmentsContainer, false
         )
-
-        view.findViewById<TextView>(R.id.appointmentReason).text = item.reason
-        view.findViewById<TextView>(R.id.appointmentDoctor).text = item.doctor
-        view.findViewById<TextView>(R.id.appointmentDateTime).text = item.dateTime
+        view.findViewById<TextView>(R.id.appointmentReason).text   = reason
+        view.findViewById<TextView>(R.id.appointmentDoctor).text   = doctor
+        view.findViewById<TextView>(R.id.appointmentDateTime).text = dateTime
 
         val statusBadge = view.findViewById<TextView>(R.id.appointmentStatus)
-        statusBadge.text = item.status
-
-        val (bgRes, textColor) = when (item.status.lowercase()) {
+        statusBadge.text = status
+        val (bgRes, textColor) = when (status.lowercase()) {
             "scheduled" -> Pair(R.drawable.badge_scheduled_bg, 0xFF2196F3.toInt())
             "completed" -> Pair(R.drawable.badge_completed_bg, 0xFF4CAF50.toInt())
             "cancelled" -> Pair(R.drawable.badge_cancelled_bg, 0xFFF44336.toInt())
-            else -> Pair(R.drawable.badge_pending_bg, 0xFFFF8F00.toInt())
+            else        -> Pair(R.drawable.badge_pending_bg,   0xFFFF8F00.toInt())
         }
         statusBadge.setBackgroundResource(bgRes)
         statusBadge.setTextColor(textColor)
-
         appointmentsContainer.addView(view)
     }
-
-    data class AppointmentItem(
-        val reason: String,
-        val doctor: String,
-        val dateTime: String,
-        val status: String
-    )
 }
