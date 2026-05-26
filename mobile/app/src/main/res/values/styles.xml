@@ -16,6 +16,12 @@
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
+    <style name="Theme.CitMedConnect.Splash" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="android:statusBarColor">@color/primary_red</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
     <!-- Primary Colors -->
     <color name="primary_red">#B71C1C</color>
     <color name="status_bar_auth">#C62828</color>

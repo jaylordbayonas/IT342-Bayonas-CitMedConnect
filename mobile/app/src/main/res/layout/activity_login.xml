@@ -48,7 +48,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/logo_image"
+                        android:src="@drawable/citu_logo"
                         android:scaleType="centerCrop"
                         android:contentDescription="CIT MedConnect Logo" />
                 </FrameLayout>

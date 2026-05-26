@@ -358,12 +358,23 @@
             android:alpha="0.55"
             android:padding="6dp">
 
-            <ImageView
+            <FrameLayout
                 android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_bell"
-                android:tint="#FFFFFF"
-                android:contentDescription="Notifications" />
+                android:layout_height="20dp">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_bell"
+                    android:tint="#FFFFFF"
+                    android:contentDescription="Notifications" />
+                <View
+                    android:id="@+id/navNotifBadge"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:background="@drawable/nav_badge_bg"
+                    android:layout_gravity="top|end"
+                    android:visibility="gone" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- PROFILE -->

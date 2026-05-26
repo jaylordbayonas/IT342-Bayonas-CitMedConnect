@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/section_card_bg"
+    android:elevation="2dp"
+    android:clipToOutline="true">
+
+    <!-- Left maroon accent strip -->
+    <View
+        android:layout_width="5dp"
+        android:layout_height="match_parent"
+        android:background="#8B1A1A" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp">
+
+        <!-- ── Header row: icon + info + expand arrow ── -->
+        <LinearLayout
+            android:id="@+id/cardHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Record icon circle -->
+            <LinearLayout
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/stat_icon_bg_red"
+                android:gravity="center"
+                android:layout_marginEnd="12dp">
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_records"
+                    android:tint="#8B1A1A"
+                    android:contentDescription="Record" />
+            </LinearLayout>
+
+            <!-- Diagnosis + meta -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/recordDiagnosis"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Diagnosis"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <!-- Student name (admin only, hidden for student) -->
+                <LinearLayout
+                    android:id="@+id/studentNameRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="2dp">
+                    <ImageView
+                        android:layout_width="11dp"
+                        android:layout_height="11dp"
+                        android:src="@drawable/ic_profile"
+                        android:tint="#BDBDBD"
+                        android:contentDescription="Student"
+                        android:layout_marginEnd="4dp" />
+                    <TextView
+                        android:id="@+id/recordStudentName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Student Name · ID"
+                        android:textSize="11sp"
+                        android:textColor="#9E9E9E" />
+                </LinearLayout>
+
+                <!-- Date row -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="2dp">
+                    <ImageView
+                        android:layout_width="11dp"
+                        android:layout_height="11dp"
+                        android:src="@drawable/ic_calendar"
+                        android:tint="#BDBDBD"
+                        android:contentDescription="Date"
+                        android:layout_marginEnd="4dp" />
+                    <TextView
+                        android:id="@+id/recordDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="May 26, 2026"
+                        android:textSize="11sp"
+                        android:textColor="#9E9E9E" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Expand / Collapse arrow -->
+            <ImageView
+                android:id="@+id/expandArrow"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_arrow_right"
+                android:tint="#BDBDBD"
+                android:rotation="90"
+                android:contentDescription="Expand"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <!-- ── Expandable detail section ── -->
+        <LinearLayout
+            android:id="@+id/detailSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#F0F0F0"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Symptoms -->
+            <LinearLayout
+                android:id="@+id/symptomsSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_trending_up"
+                        android:tint="#8B1A1A"
+                        android:contentDescription="Symptoms"
+                        android:layout_marginEnd="5dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SYMPTOMS"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#8B1A1A"
+                        android:letterSpacing="0.08" />
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/recordSymptoms"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="13sp"
+                    android:textColor="#424242"
+                    android:background="@drawable/record_card_detail_bg"
+                    android:padding="10dp" />
+            </LinearLayout>
+
+            <!-- Vital Signs -->
+            <LinearLayout
+                android:id="@+id/vitalsSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_trending_up"
+                        android:tint="#8B1A1A"
+                        android:contentDescription="Vitals"
+                        android:layout_marginEnd="5dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="VITAL SIGNS"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#8B1A1A"
+                        android:letterSpacing="0.08" />
+                </LinearLayout>
+                <!-- 2x2 vitals grid -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:id="@+id/vitalBP"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/vital_chip_bg"
+                        android:padding="8dp"
+                        android:layout_marginEnd="5dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="BLOOD PRESSURE"
+                            android:textSize="8sp"
+                            android:textColor="#9E9E9E"
+                            android:letterSpacing="0.05" />
+                        <TextView
+                            android:id="@+id/vitalBPValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#212121" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/vitalHR"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/vital_chip_bg"
+                        android:padding="8dp"
+                        android:layout_marginEnd="5dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="HEART RATE"
+                            android:textSize="8sp"
+                            android:textColor="#9E9E9E"
+                            android:letterSpacing="0.05" />
+                        <TextView
+                            android:id="@+id/vitalHRValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#212121" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/vitalTemp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/vital_chip_bg"
+                        android:padding="8dp"
+                        android:layout_marginEnd="5dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TEMPERATURE"
+                            android:textSize="8sp"
+                            android:textColor="#9E9E9E"
+                            android:letterSpacing="0.05" />
+                        <TextView
+                            android:id="@+id/vitalTempValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#212121" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/vitalWeight"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/vital_chip_bg"
+                        android:padding="8dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="WEIGHT"
+                            android:textSize="8sp"
+                            android:textColor="#9E9E9E"
+                            android:letterSpacing="0.05" />
+                        <TextView
+                            android:id="@+id/vitalWeightValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#212121" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Treatment -->
+            <LinearLayout
+                android:id="@+id/treatmentSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_check"
+                        android:tint="#8B1A1A"
+                        android:contentDescription="Treatment"
+                        android:layout_marginEnd="5dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TREATMENT"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#8B1A1A"
+                        android:letterSpacing="0.08" />
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/recordTreatment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="13sp"
+                    android:textColor="#424242"
+                    android:background="@drawable/record_card_detail_bg"
+                    android:padding="10dp" />
+            </LinearLayout>
+
+            <!-- Prescriptions -->
+            <LinearLayout
+                android:id="@+id/prescriptionSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_id_card"
+                        android:tint="#8B1A1A"
+                        android:contentDescription="Prescription"
+                        android:layout_marginEnd="5dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PRESCRIPTIONS"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#8B1A1A"
+                        android:letterSpacing="0.08" />
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/recordPrescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="13sp"
+                    android:textColor="#424242"
+                    android:background="@drawable/record_card_detail_bg"
+                    android:padding="10dp" />
+            </LinearLayout>
+
+            <!-- Allergies -->
+            <LinearLayout
+                android:id="@+id/allergiesSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_bell"
+                        android:tint="#8B1A1A"
+                        android:contentDescription="Allergies"
+                        android:layout_marginEnd="5dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ALLERGIES"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#8B1A1A"
+                        android:letterSpacing="0.08" />
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/recordAllergies"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="13sp"
+                    android:textColor="#424242"
+                    android:background="@drawable/record_card_detail_bg"
+                    android:padding="10dp" />
+            </LinearLayout>
+
+            <!-- Medical History -->
+            <LinearLayout
+                android:id="@+id/medHistorySection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_records"
+                        android:tint="#8B1A1A"
+                        android:contentDescription="History"
+                        android:layout_marginEnd="5dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MEDICAL HISTORY"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#8B1A1A"
+                        android:letterSpacing="0.08" />
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/recordMedHistory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="13sp"
+                    android:textColor="#424242"
+                    android:background="@drawable/record_card_detail_bg"
+                    android:padding="10dp" />
+            </LinearLayout>
+
+            <!-- Additional Notes -->
+            <LinearLayout
+                android:id="@+id/notesSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_edit"
+                        android:tint="#8B1A1A"
+                        android:contentDescription="Notes"
+                        android:layout_marginEnd="5dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ADDITIONAL NOTES"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#8B1A1A"
+                        android:letterSpacing="0.08" />
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/recordNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="13sp"
+                    android:textColor="#424242"
+                    android:background="@drawable/record_card_detail_bg"
+                    android:padding="10dp" />
+            </LinearLayout>
+
+            <!-- Footer: Record ID + dates + admin delete -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/recordIdText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Record ID: —"
+                        android:textSize="10sp"
+                        android:textColor="#BDBDBD" />
+                    <TextView
+                        android:id="@+id/recordCreatedAt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Created: —"
+                        android:textSize="10sp"
+                        android:textColor="#BDBDBD" />
+                </LinearLayout>
+                <!-- Delete (admin only) -->
+                <LinearLayout
+                    android:id="@+id/btnDelete"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:background="@drawable/action_btn_red_solid"
+                    android:gravity="center"
+                    android:visibility="gone">
+                    <ImageView
+                        android:layout_width="17dp"
+                        android:layout_height="17dp"
+                        android:src="@drawable/ic_delete"
+                        android:tint="#F44336"
+                        android:contentDescription="Delete" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

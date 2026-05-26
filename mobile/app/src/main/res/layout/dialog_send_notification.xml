@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_rounded_bg">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="14dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Send Notification"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:textColor="#212121" />
+
+        <LinearLayout
+            android:id="@+id/closeBtn"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/close_btn_bg"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:src="@drawable/ic_close"
+                android:tint="#757575"
+                android:contentDescription="Close" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" />
+
+    <!-- Scrollable body -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp">
+
+            <!-- TARGET AUDIENCE section -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="16dp"
+                    android:background="#8B1A1A"
+                    android:layout_marginEnd="8dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TARGET AUDIENCE"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#8B1A1A"
+                    android:letterSpacing="0.06" />
+            </LinearLayout>
+
+            <!-- Audience radio buttons -->
+            <RadioGroup
+                android:id="@+id/audienceGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp">
+
+                <RadioButton
+                    android:id="@+id/radioStudents"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="All Students"
+                    android:textSize="13sp"
+                    android:textColor="#212121"
+                    android:checked="true"
+                    android:paddingStart="12dp"
+                    android:background="@drawable/input_outline_bg"
+                    android:layout_marginBottom="8dp"
+                    android:buttonTint="#8B1A1A" />
+
+                <RadioButton
+                    android:id="@+id/radioStaff"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Staff &amp; Admins"
+                    android:textSize="13sp"
+                    android:textColor="#212121"
+                    android:paddingStart="12dp"
+                    android:background="@drawable/input_outline_bg"
+                    android:layout_marginBottom="8dp"
+                    android:buttonTint="#8B1A1A" />
+
+                <RadioButton
+                    android:id="@+id/radioEveryone"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Everyone"
+                    android:textSize="13sp"
+                    android:textColor="#212121"
+                    android:paddingStart="12dp"
+                    android:background="@drawable/input_outline_bg"
+                    android:buttonTint="#8B1A1A" />
+            </RadioGroup>
+
+            <!-- NOTIFICATION DETAILS section -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="16dp"
+                    android:background="#8B1A1A"
+                    android:layout_marginEnd="8dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NOTIFICATION DETAILS"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#8B1A1A"
+                    android:letterSpacing="0.06" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Title *"
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="6dp" />
+
+            <EditText
+                android:id="@+id/titleInput"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Notification title"
+                android:inputType="textCapSentences"
+                android:background="@drawable/input_outline_bg"
+                android:padding="12dp"
+                android:textSize="13sp"
+                android:textColor="#212121"
+                android:textColorHint="#9E9E9E"
+                android:layout_marginBottom="12dp"
+                android:importantForAutofill="no" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Message *"
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="6dp" />
+
+            <EditText
+                android:id="@+id/messageInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Write your message here..."
+                android:inputType="textMultiLine|textCapSentences"
+                android:minLines="3"
+                android:maxLines="5"
+                android:minHeight="80dp"
+                android:background="@drawable/input_outline_bg"
+                android:padding="12dp"
+                android:textSize="13sp"
+                android:textColor="#212121"
+                android:textColorHint="#9E9E9E"
+                android:layout_marginBottom="12dp"
+                android:importantForAutofill="no" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Type"
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="6dp" />
+
+            <FrameLayout
+                android:id="@+id/typeSpinnerContainer"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/input_outline_bg"
+                android:layout_marginBottom="16dp">
+                <Spinner
+                    android:id="@+id/typeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="36dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:rotation="90"
+                    android:tint="#757575"
+                    android:contentDescription="Expand"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="12dp"
+                    android:clickable="false"
+                    android:focusable="false" />
+            </FrameLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Footer -->
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp"
+        android:gravity="end">
+
+        <LinearLayout
+            android:id="@+id/cancelBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:orientation="horizontal"
+            android:background="@drawable/close_btn_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:layout_marginEnd="10dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#757575" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sendBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:orientation="horizontal"
+            android:background="@drawable/button_primary_pill"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_bell"
+                android:tint="#FFFFFF"
+                android:contentDescription="Send"
+                android:layout_marginEnd="6dp" />
+            <TextView
+                android:id="@+id/sendBtnText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send Notification"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -13,11 +13,13 @@ import edu.cit.bayonas.citmedconnect.R
 import edu.cit.bayonas.citmedconnect.data.SessionManager
 import edu.cit.bayonas.citmedconnect.data.model.AppointmentResponse
 import edu.cit.bayonas.citmedconnect.ui.viewmodel.AppointmentViewModel
+import edu.cit.bayonas.citmedconnect.ui.viewmodel.NotificationViewModel
 import java.util.Calendar
 
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var viewModel: AppointmentViewModel
+    private lateinit var notifViewModel: NotificationViewModel
 
     private lateinit var greetingText: TextView
     private lateinit var userNameText: TextView
@@ -47,13 +49,15 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var navMedicalRecords: LinearLayout
     private lateinit var navNotifications: LinearLayout
     private lateinit var navProfile: LinearLayout
+    private lateinit var navNotifBadge: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = getColor(R.color.primary_red)
         setContentView(R.layout.activity_dashboard)
 
-        viewModel = ViewModelProvider(this).get(AppointmentViewModel::class.java)
+        viewModel      = ViewModelProvider(this).get(AppointmentViewModel::class.java)
+        notifViewModel = ViewModelProvider(this)[NotificationViewModel::class.java]
         val isAdmin = SessionManager.isAdmin(this)
 
         bindViews()
@@ -61,6 +65,7 @@ class DashboardActivity : AppCompatActivity() {
         adaptToRole(isAdmin)
         setupNavigation(isAdmin)
         observeViewModel(isAdmin)
+        observeNotifBadge()
 
         if (isAdmin) {
             viewModel.fetchAllAppointments()
@@ -99,6 +104,7 @@ class DashboardActivity : AppCompatActivity() {
         navMedicalRecords      = findViewById(R.id.navMedicalRecords)
         navNotifications       = findViewById(R.id.navNotifications)
         navProfile             = findViewById(R.id.navProfile)
+        navNotifBadge          = findViewById(R.id.navNotifBadge)
     }
 
     private fun setupGreeting() {
@@ -141,10 +147,12 @@ class DashboardActivity : AppCompatActivity() {
             overridePendingTransition(0, 0)
         }
         navMedicalRecords.setOnClickListener {
-            Toast.makeText(this, "Medical Records coming soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, MedicalRecordsActivity::class.java))
+            overridePendingTransition(0, 0)
         }
         navNotifications.setOnClickListener {
-            Toast.makeText(this, "Notifications coming soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, NotificationsActivity::class.java))
+            overridePendingTransition(0, 0)
         }
         navProfile.setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
@@ -274,5 +282,13 @@ class DashboardActivity : AppCompatActivity() {
         statusBadge.setBackgroundResource(bgRes)
         statusBadge.setTextColor(textColor)
         appointmentsContainer.addView(view)
+    }
+
+    private fun observeNotifBadge() {
+        val schoolId = SessionManager.schoolId(this) ?: return
+        notifViewModel.fetchUnreadCount(schoolId)
+        notifViewModel.unreadCount.observe(this) { count ->
+            navNotifBadge.visibility = if (count > 0) View.VISIBLE else View.GONE
+        }
     }
 }

@@ -25,10 +25,12 @@ import edu.cit.bayonas.citmedconnect.data.SessionManager
 import edu.cit.bayonas.citmedconnect.data.model.AppointmentResponse
 import edu.cit.bayonas.citmedconnect.data.model.TimeSlotData
 import edu.cit.bayonas.citmedconnect.ui.viewmodel.AppointmentViewModel
+import edu.cit.bayonas.citmedconnect.ui.viewmodel.NotificationViewModel
 
 class AdminAppointmentsActivity : AppCompatActivity() {
 
     private lateinit var viewModel: AppointmentViewModel
+    private lateinit var notifViewModel: NotificationViewModel
     private lateinit var searchInput: EditText
     private lateinit var filterAll: TextView
     private lateinit var filterScheduled: TextView
@@ -44,6 +46,7 @@ class AdminAppointmentsActivity : AppCompatActivity() {
     private lateinit var navMedicalRecords: LinearLayout
     private lateinit var navNotifications: LinearLayout
     private lateinit var navProfile: LinearLayout
+    private lateinit var navNotifBadge: View
 
     private var currentFilter = "All"
     private var currentSearch = ""
@@ -54,13 +57,15 @@ class AdminAppointmentsActivity : AppCompatActivity() {
         window.statusBarColor = getColor(R.color.primary_red)
         setContentView(R.layout.activity_admin_appointments)
 
-        viewModel = ViewModelProvider(this).get(AppointmentViewModel::class.java)
+        viewModel      = ViewModelProvider(this).get(AppointmentViewModel::class.java)
+        notifViewModel = ViewModelProvider(this)[NotificationViewModel::class.java]
 
         bindViews()
         setupFilterChips()
         setupSearch()
         setupNavigation()
         observeViewModel()
+        observeNotifBadge()
         viewModel.fetchAllAppointments()
     }
 
@@ -80,6 +85,7 @@ class AdminAppointmentsActivity : AppCompatActivity() {
         navMedicalRecords         = findViewById(R.id.navMedicalRecords)
         navNotifications          = findViewById(R.id.navNotifications)
         navProfile                = findViewById(R.id.navProfile)
+        navNotifBadge             = findViewById(R.id.navNotifBadge)
     }
 
     private fun observeViewModel() {
@@ -151,10 +157,13 @@ class AdminAppointmentsActivity : AppCompatActivity() {
         }
         navAppointments.setOnClickListener { }
         navMedicalRecords.setOnClickListener {
-            Toast.makeText(this, "Medical Records coming soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, MedicalRecordsActivity::class.java))
+            overridePendingTransition(0, 0)
         }
         navNotifications.setOnClickListener {
-            Toast.makeText(this, "Notifications coming soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, NotificationsActivity::class.java))
+            overridePendingTransition(0, 0)
+            finish()
         }
         navProfile.setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
@@ -518,5 +527,13 @@ class AdminAppointmentsActivity : AppCompatActivity() {
         }
 
         container.addView(view)
+    }
+
+    private fun observeNotifBadge() {
+        val schoolId = SessionManager.schoolId(this) ?: return
+        notifViewModel.fetchUnreadCount(schoolId)
+        notifViewModel.unreadCount.observe(this) { count ->
+            navNotifBadge.visibility = if (count > 0) View.VISIBLE else View.GONE
+        }
     }
 }

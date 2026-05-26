@@ -36,6 +36,8 @@ object RetrofitClient {
         .client(client)
         .build()
 
-    val authService: AuthService           = retrofit.create(AuthService::class.java)
+    val authService: AuthService               = retrofit.create(AuthService::class.java)
     val appointmentService: AppointmentService = retrofit.create(AppointmentService::class.java)
+    val medicalRecordService: MedicalRecordService = retrofit.create(MedicalRecordService::class.java)
+    val notificationService: NotificationService   = retrofit.create(NotificationService::class.java)
 }
