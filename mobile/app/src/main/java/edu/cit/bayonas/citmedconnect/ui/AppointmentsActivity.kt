@@ -25,10 +25,12 @@ import edu.cit.bayonas.citmedconnect.data.SessionManager
 import edu.cit.bayonas.citmedconnect.data.model.AppointmentResponse
 import edu.cit.bayonas.citmedconnect.data.model.TimeSlotData
 import edu.cit.bayonas.citmedconnect.ui.viewmodel.AppointmentViewModel
+import edu.cit.bayonas.citmedconnect.ui.viewmodel.NotificationViewModel
 
 class AppointmentsActivity : AppCompatActivity() {
 
     private lateinit var viewModel: AppointmentViewModel
+    private lateinit var notifViewModel: NotificationViewModel
     private lateinit var searchInput: EditText
     private lateinit var filterAll: TextView
     private lateinit var filterScheduled: TextView
@@ -44,6 +46,7 @@ class AppointmentsActivity : AppCompatActivity() {
     private lateinit var navMedicalRecords: LinearLayout
     private lateinit var navNotifications: LinearLayout
     private lateinit var navProfile: LinearLayout
+    private lateinit var navNotifBadge: View
 
     private var currentFilter = "All"
     private var currentSearch = ""
@@ -54,13 +57,15 @@ class AppointmentsActivity : AppCompatActivity() {
         window.statusBarColor = getColor(R.color.primary_red)
         setContentView(R.layout.activity_appointments)
 
-        viewModel = ViewModelProvider(this).get(AppointmentViewModel::class.java)
+        viewModel      = ViewModelProvider(this).get(AppointmentViewModel::class.java)
+        notifViewModel = ViewModelProvider(this)[NotificationViewModel::class.java]
 
         bindViews()
         setupFilterChips()
         setupSearch()
         setupNavigation()
         observeViewModel()
+        observeNotifBadge()
         viewModel.fetchMyAppointments()
 
         if (intent.getBooleanExtra("OPEN_BOOKING_MODAL", false)) {
@@ -84,6 +89,7 @@ class AppointmentsActivity : AppCompatActivity() {
         navMedicalRecords        = findViewById(R.id.navMedicalRecords)
         navNotifications         = findViewById(R.id.navNotifications)
         navProfile               = findViewById(R.id.navProfile)
+        navNotifBadge            = findViewById(R.id.navNotifBadge)
     }
 
     private fun observeViewModel() {
@@ -152,10 +158,13 @@ class AppointmentsActivity : AppCompatActivity() {
         }
         navAppointments.setOnClickListener { }
         navMedicalRecords.setOnClickListener {
-            Toast.makeText(this, "Medical Records coming soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, MedicalRecordsActivity::class.java))
+            overridePendingTransition(0, 0)
         }
         navNotifications.setOnClickListener {
-            Toast.makeText(this, "Notifications coming soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, NotificationsActivity::class.java))
+            overridePendingTransition(0, 0)
+            finish()
         }
         navProfile.setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
@@ -568,5 +577,13 @@ class AppointmentsActivity : AppCompatActivity() {
         view.findViewById<TextView>(R.id.slotTime).setTextColor(0xFF212121.toInt())
         view.findViewById<TextView>(R.id.slotLocation).setTextColor(0xFF9E9E9E.toInt())
         view.findViewById<ImageView>(R.id.slotIcon).imageTintList = ColorStateList.valueOf(0xFF757575.toInt())
+    }
+
+    private fun observeNotifBadge() {
+        val schoolId = SessionManager.schoolId(this) ?: return
+        notifViewModel.fetchUnreadCount(schoolId)
+        notifViewModel.unreadCount.observe(this) { count ->
+            navNotifBadge.visibility = if (count > 0) View.VISIBLE else View.GONE
+        }
     }
 }

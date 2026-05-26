@@ -208,30 +208,17 @@ public class NotificationService {
         return mapper.toDTOList(notifications);
     }
     
+    @SuppressWarnings("java:S1172")
     public List<NotificationDTO> getNotificationsForUser(String schoolId, String userRole) {
-        List<NotificationEntity> userSpecificNotifications = notificationRepository.findBySchoolId(schoolId);
-        List<NotificationEntity> studentBroadcasts = notificationRepository.findByNotificationType("STUDENT_BROADCAST");
-        List<NotificationEntity> staffBroadcasts = notificationRepository.findByNotificationType("STAFF_BROADCAST");
-        List<NotificationEntity> globalBroadcasts = notificationRepository.findByNotificationType("GLOBAL_BROADCAST");
-        
-        List<NotificationEntity> allNotifications = new ArrayList<>();
-        allNotifications.addAll(userSpecificNotifications);
-        
-        if ("STUDENT".equalsIgnoreCase(userRole)) {
-            allNotifications.addAll(studentBroadcasts);
-        } else if ("STAFF".equalsIgnoreCase(userRole) || "ADMIN".equalsIgnoreCase(userRole)) {
-            allNotifications.addAll(staffBroadcasts);
-        } else {
-            allNotifications.addAll(studentBroadcasts);
-            allNotifications.addAll(staffBroadcasts);
-        }
-        
-        allNotifications.addAll(globalBroadcasts);
-        
-        List<NotificationEntity> sortedNotifications = allNotifications.stream()
+        // Broadcasts are already saved as per-user records (each recipient has their own row
+        // with their schoolId), so a single findBySchoolId query is sufficient.
+        // Querying by broadcast type on top of this caused every broadcast to appear twice.
+        List<NotificationEntity> userNotifications = notificationRepository.findBySchoolId(schoolId);
+
+        List<NotificationEntity> sortedNotifications = userNotifications.stream()
             .sorted((n1, n2) -> n2.getCreatedAt().compareTo(n1.getCreatedAt()))
             .collect(Collectors.toList());
-            
+
         return mapper.toDTOList(sortedNotifications);
     }
     

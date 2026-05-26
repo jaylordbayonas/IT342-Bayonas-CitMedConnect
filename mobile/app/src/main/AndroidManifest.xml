@@ -16,7 +16,8 @@
 
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.CitMedConnect.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -58,6 +59,18 @@
 
         <activity
             android:name=".ui.ProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CitMedConnect.Auth"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.MedicalRecordsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CitMedConnect.Auth"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.NotificationsActivity"
             android:exported="false"
             android:theme="@style/Theme.CitMedConnect.Auth"
             android:windowSoftInputMode="adjustPan" />

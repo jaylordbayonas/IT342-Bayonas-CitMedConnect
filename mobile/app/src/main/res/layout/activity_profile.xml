@@ -16,17 +16,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- ===== PAGE HEADER ===== -->
+            <!-- ===== PAGE HEADER (red gradient) ===== -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="#FFFFFF"
-                android:elevation="2dp"
+                android:background="@drawable/gradient_red_bg"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
-                android:paddingTop="52dp"
-                android:paddingBottom="16dp">
+                android:paddingTop="48dp"
+                android:paddingBottom="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -34,14 +33,14 @@
                     android:text="Profile"
                     android:textSize="22sp"
                     android:textStyle="bold"
-                    android:textColor="@color/primary_red" />
+                    android:textColor="#FFFFFF" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Manage your personal information"
-                    android:textSize="12sp"
-                    android:textColor="#9E9E9E"
+                    android:textSize="13sp"
+                    android:textColor="#CCFFFFFF"
                     android:layout_marginTop="2dp" />
             </LinearLayout>
 
@@ -665,12 +664,23 @@
             android:alpha="0.55"
             android:padding="6dp">
 
-            <ImageView
+            <FrameLayout
                 android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_bell"
-                android:tint="#FFFFFF"
-                android:contentDescription="Notifications" />
+                android:layout_height="20dp">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_bell"
+                    android:tint="#FFFFFF"
+                    android:contentDescription="Notifications" />
+                <View
+                    android:id="@+id/navNotifBadge"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:background="@drawable/nav_badge_bg"
+                    android:layout_gravity="top|end"
+                    android:visibility="gone" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- PROFILE (active) -->

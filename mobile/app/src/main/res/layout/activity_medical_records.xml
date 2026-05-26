@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <!-- ===== SCROLLABLE CONTENT ===== -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="96dp"
+        android:clipToPadding="false"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- ── Header bar ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/gradient_red_bg"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="48dp"
+                android:paddingBottom="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Medical Records"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/headerSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="View your complete medical history"
+                    android:textSize="13sp"
+                    android:textColor="#CCFFFFFF"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+
+            <!-- ── Stats row ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="4dp">
+
+                <!-- Total Records -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="@drawable/section_card_bg"
+                    android:padding="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:gravity="center"
+                    android:minHeight="108dp"
+                    android:elevation="1dp">
+                    <LinearLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/stat_icon_bg_red"
+                        android:gravity="center"
+                        android:layout_marginBottom="6dp">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_records"
+                            android:tint="#8B1A1A"
+                            android:contentDescription="Records" />
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/statTotalRecords"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RECORDS"
+                        android:textSize="7sp"
+                        android:textColor="#9E9E9E"
+                        android:letterSpacing="0.06"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <!-- Last Blood Pressure -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="@drawable/section_card_bg"
+                    android:padding="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:gravity="center"
+                    android:minHeight="108dp"
+                    android:elevation="1dp">
+                    <LinearLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/stat_icon_bg_blue"
+                        android:gravity="center"
+                        android:layout_marginBottom="6dp">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_trending_up"
+                            android:tint="#2196F3"
+                            android:contentDescription="BP" />
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/statLastBP"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="—"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LAST BP"
+                        android:textSize="7sp"
+                        android:textColor="#9E9E9E"
+                        android:letterSpacing="0.06"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <!-- Last Heart Rate -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="@drawable/section_card_bg"
+                    android:padding="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:gravity="center"
+                    android:minHeight="108dp"
+                    android:elevation="1dp">
+                    <LinearLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/stat_icon_bg_amber"
+                        android:gravity="center"
+                        android:layout_marginBottom="6dp">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_trending_up"
+                            android:tint="#FF8F00"
+                            android:contentDescription="HR" />
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/statLastHR"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="—"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LAST HR"
+                        android:textSize="7sp"
+                        android:textColor="#9E9E9E"
+                        android:letterSpacing="0.06"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <!-- Active Prescriptions -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="@drawable/section_card_bg"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:minHeight="108dp"
+                    android:elevation="1dp">
+                    <LinearLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/stat_icon_bg_purple"
+                        android:gravity="center"
+                        android:layout_marginBottom="6dp">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_id_card"
+                            android:tint="#9C27B0"
+                            android:contentDescription="Prescriptions" />
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/statPrescriptions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PRESCRIPTIONS"
+                        android:textSize="7sp"
+                        android:textColor="#9E9E9E"
+                        android:letterSpacing="0.06"
+                        android:gravity="center" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── Search bar (admin only) ── -->
+            <LinearLayout
+                android:id="@+id/searchBarContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="4dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/search_field_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_search"
+                        android:tint="#9E9E9E"
+                        android:contentDescription="Search"
+                        android:layout_marginEnd="8dp" />
+                    <EditText
+                        android:id="@+id/searchInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="Search by student name, ID"
+                        android:background="@null"
+                        android:textSize="13sp"
+                        android:textColor="#212121"
+                        android:textColorHint="#9E9E9E"
+                        android:inputType="text"
+                        android:importantForAutofill="no"
+                        android:singleLine="true" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── Records list ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
+
+                <!-- Section heading row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="18dp"
+                            android:background="#8B1A1A"
+                            android:layout_marginEnd="8dp" />
+                        <TextView
+                            android:id="@+id/sectionLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Medical History"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#212121" />
+                    </LinearLayout>
+
+                    <!-- Create Record button (admin only) -->
+                    <LinearLayout
+                        android:id="@+id/createRecordBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:orientation="horizontal"
+                        android:background="@drawable/button_primary_pill"
+                        android:gravity="center"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:visibility="gone">
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_records"
+                            android:tint="#FFFFFF"
+                            android:contentDescription="Create"
+                            android:layout_marginEnd="5dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="+ Create Record"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Loading indicator -->
+                <LinearLayout
+                    android:id="@+id/loadingState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingTop="32dp"
+                    android:paddingBottom="32dp"
+                    android:visibility="gone">
+                    <ProgressBar
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:indeterminateTint="#8B1A1A" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Loading records..."
+                        android:textSize="13sp"
+                        android:textColor="#9E9E9E"
+                        android:layout_marginTop="10dp" />
+                </LinearLayout>
+
+                <!-- Empty state -->
+                <LinearLayout
+                    android:id="@+id/emptyState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingTop="48dp"
+                    android:paddingBottom="48dp"
+                    android:visibility="gone">
+                    <LinearLayout
+                        android:layout_width="76dp"
+                        android:layout_height="76dp"
+                        android:background="@drawable/stat_icon_bg_red"
+                        android:gravity="center"
+                        android:layout_marginBottom="14dp">
+                        <ImageView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:src="@drawable/ic_records"
+                            android:tint="#8B1A1A"
+                            android:contentDescription="No records" />
+                    </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No Medical Records"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#424242"
+                        android:gravity="center"
+                        android:layout_marginBottom="6dp" />
+                    <TextView
+                        android:id="@+id/emptySubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Your medical records will appear here after an appointment is completed."
+                        android:textSize="12sp"
+                        android:textColor="#9E9E9E"
+                        android:gravity="center"
+                        android:lineSpacingExtra="3dp"
+                        android:paddingStart="24dp"
+                        android:paddingEnd="24dp" />
+                </LinearLayout>
+
+                <!-- Dynamic records container -->
+                <LinearLayout
+                    android:id="@+id/recordsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ===== FLOATING BOTTOM NAVIGATION (Medical Records active) ===== -->
+    <LinearLayout
+        android:id="@+id/navBar"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal"
+        android:background="@drawable/nav_floating_bg"
+        android:elevation="10dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp">
+
+        <!-- HOME -->
+        <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:alpha="0.55"
+            android:padding="6dp">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_home"
+                android:tint="#FFFFFF"
+                android:contentDescription="Home" />
+        </LinearLayout>
+
+        <!-- APPOINTMENTS -->
+        <LinearLayout
+            android:id="@+id/navAppointments"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:alpha="0.55"
+            android:padding="6dp">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_appointment"
+                android:tint="#FFFFFF"
+                android:contentDescription="Appointments" />
+        </LinearLayout>
+
+        <!-- MEDICAL RECORDS (active) -->
+        <LinearLayout
+            android:id="@+id/navMedicalRecords"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/nav_item_active_bg"
+            android:padding="6dp">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_records"
+                android:tint="#FFFFFF"
+                android:contentDescription="Medical Records" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Records"
+                android:textSize="9sp"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- NOTIFICATIONS -->
+        <LinearLayout
+            android:id="@+id/navNotifications"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:alpha="0.55"
+            android:padding="6dp">
+            <FrameLayout
+                android:layout_width="20dp"
+                android:layout_height="20dp">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_bell"
+                    android:tint="#FFFFFF"
+                    android:contentDescription="Notifications" />
+                <View
+                    android:id="@+id/navNotifBadge"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:background="@drawable/nav_badge_bg"
+                    android:layout_gravity="top|end"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- PROFILE -->
+        <LinearLayout
+            android:id="@+id/navProfile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:alpha="0.55"
+            android:padding="6dp">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_profile"
+                android:tint="#FFFFFF"
+                android:contentDescription="Profile" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -2,27 +2,35 @@ package edu.cit.bayonas.citmedconnect.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import edu.cit.bayonas.citmedconnect.R
 import edu.cit.bayonas.citmedconnect.data.SessionManager
 import edu.cit.bayonas.citmedconnect.data.api.RetrofitClient
+import edu.cit.bayonas.citmedconnect.ui.viewmodel.NotificationViewModel
 import kotlinx.coroutines.launch
 
 class ProfileActivity : AppCompatActivity() {
+
+    private lateinit var notifViewModel: NotificationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = getColor(R.color.primary_red)
         setContentView(R.layout.activity_profile)
 
+        notifViewModel = ViewModelProvider(this)[NotificationViewModel::class.java]
+
         populateFromSession()
         setupNavigation()
         setupLogout()
         fetchFullProfile()
+        observeNotifBadge()
     }
 
     private fun populateFromSession() {
@@ -114,11 +122,24 @@ class ProfileActivity : AppCompatActivity() {
             finish()
         }
         findViewById<LinearLayout>(R.id.navMedicalRecords).setOnClickListener {
-            Toast.makeText(this, "Medical Records coming soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, MedicalRecordsActivity::class.java))
+            overridePendingTransition(0, 0)
+            finish()
         }
         findViewById<LinearLayout>(R.id.navNotifications).setOnClickListener {
-            Toast.makeText(this, "Notifications coming soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, NotificationsActivity::class.java))
+            overridePendingTransition(0, 0)
+            finish()
         }
         findViewById<LinearLayout>(R.id.navProfile).setOnClickListener { }
+    }
+
+    private fun observeNotifBadge() {
+        val schoolId = SessionManager.schoolId(this) ?: return
+        notifViewModel.fetchUnreadCount(schoolId)
+        notifViewModel.unreadCount.observe(this) { count ->
+            val badge = findViewById<View>(R.id.navNotifBadge)
+            badge?.visibility = if (count > 0) View.VISIBLE else View.GONE
+        }
     }
 }

@@ -16,17 +16,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- ===== PAGE HEADER (white card) ===== -->
+            <!-- ===== PAGE HEADER (red gradient) ===== -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="#FFFFFF"
-                android:elevation="2dp"
+                android:background="@drawable/gradient_red_bg"
                 android:paddingStart="20dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="52dp"
-                android:paddingBottom="16dp">
+                android:paddingEnd="20dp"
+                android:paddingTop="48dp"
+                android:paddingBottom="20dp">
 
                 <!-- Title row + Book button -->
                 <LinearLayout
@@ -43,17 +42,17 @@
                         android:text="Appointments"
                         android:textSize="22sp"
                         android:textStyle="bold"
-                        android:textColor="@color/primary_red" />
+                        android:textColor="#FFFFFF" />
 
-                    <!-- Book Appointment button -->
+                    <!-- Book Appointment button (white pill on red bg) -->
                     <LinearLayout
                         android:id="@+id/bookAppointmentBtn"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="34dp"
                         android:orientation="horizontal"
-                        android:background="@drawable/button_primary_pill"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp"
+                        android:background="@drawable/nav_item_active_bg"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
                         android:gravity="center">
 
                         <TextView
@@ -72,8 +71,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="View and manage your appointments"
-                    android:textSize="12sp"
-                    android:textColor="#9E9E9E" />
+                    android:textSize="13sp"
+                    android:textColor="#CCFFFFFF" />
 
             </LinearLayout>
 
@@ -367,12 +366,23 @@
             android:alpha="0.55"
             android:padding="6dp">
 
-            <ImageView
+            <FrameLayout
                 android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_bell"
-                android:tint="#FFFFFF"
-                android:contentDescription="Notifications" />
+                android:layout_height="20dp">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_bell"
+                    android:tint="#FFFFFF"
+                    android:contentDescription="Notifications" />
+                <View
+                    android:id="@+id/navNotifBadge"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:background="@drawable/nav_badge_bg"
+                    android:layout_gravity="top|end"
+                    android:visibility="gone" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- PROFILE -->
