@@ -65,7 +65,8 @@ class AppointmentService {
                 slots = allSlots.filter((slot) => {
                     const maxBookings = Number(slot.maxBookings ?? 1);
                     const currentBookings = Number(slot.currentBookings ?? 0);
-                    return slot.available === true && currentBookings < maxBookings;
+                    const isAvailable = slot.isAvailable === true || slot.available === true;
+                    return isAvailable && currentBookings < maxBookings;
                 });
             }
 
@@ -359,7 +360,7 @@ class AppointmentService {
                     endTime: slotData.endTime || this.calculateEndTime(slotData.time),
                     maxBookings: slotData.maxBookings || 1,
                     staffId: slotData.staffId || this.user?.userId || 'STAFF001',
-                    isAvailable: slotData.isAvailable !== undefined ? slotData.isAvailable : true
+                    isAvailable: slotData.isAvailable ?? true
                 })
             });
 

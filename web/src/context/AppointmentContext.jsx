@@ -186,7 +186,11 @@ export const AppointmentProvider = ({ children }) => {
     let filtered = appointments;
     if (!isStaffOrAdmin(user?.role)) {
       const currentStudentId = user.userId || user.schoolId;
-      filtered = appointments.filter(apt => apt.studentId === currentStudentId);
+      filtered = appointments.filter(apt =>
+        apt.studentId === currentStudentId ||
+        apt.schoolId === currentStudentId ||
+        apt.user?.schoolId === currentStudentId
+      );
     }
     return filtered.sort((a, b) => {
       const dateA = new Date(`${a.scheduledDate || a.date}T${a.scheduledTime || a.time}`);

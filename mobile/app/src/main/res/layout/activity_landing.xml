@@ -56,10 +56,10 @@
 
                 <ImageView
                     android:id="@+id/logoImage"
-                    android:layout_width="54dp"
-                    android:layout_height="54dp"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/citu_logo"
+                    android:src="@drawable/medconnet_appiconv2"
                     android:scaleType="centerCrop"
                     android:contentDescription="CIT MedConnect Logo" />
             </FrameLayout>

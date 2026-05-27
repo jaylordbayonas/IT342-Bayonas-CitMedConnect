@@ -44,11 +44,11 @@
                         android:layout_height="80dp"
                         android:background="@drawable/logo_circle_bg" />
 
-                    <ImageView
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
+                     <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/citu_logo"
+                        android:src="@drawable/medconnet_appiconv2"
                         android:scaleType="centerCrop"
                         android:contentDescription="CIT MedConnect Logo" />
                 </FrameLayout>

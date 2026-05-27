@@ -7,7 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "http://10.0.2.2:8080/"
+    private const val BASE_URL = "http://127.0.0.1:8080/"
 
     // Set these after a successful login so all subsequent requests carry auth headers
     @Volatile var authToken: String? = null

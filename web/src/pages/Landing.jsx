@@ -10,7 +10,7 @@ import {
 import { initiateGitHubLogin } from '../services/github-oauth-service';
 import './Landing.css';
 
-const logo = '/images/logo.jpg';
+const logo = '/images/medconnet_appiconv2.png';
 
 const Landing = () => {
   const navigate = useNavigate();

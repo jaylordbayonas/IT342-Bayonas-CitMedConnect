@@ -7,7 +7,7 @@ import { initiateGitHubLogin } from '../services/github-oauth-service';
 import './LandingPage.css';
 import Galaxy from './Galaxy';
 
-const logo   = '/images/citu-logo.png';
+const logo   = '/images/medconnet_appiconv2.png';
 const mascot = '/images/MascotCit.png';
 
 /* ============================================

@@ -45,10 +45,10 @@
                         android:background="@drawable/logo_circle_bg" />
 
                     <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="68dp"
+                        android:layout_height="68dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/citu_logo"
+                        android:src="@drawable/medconnet_appiconv2"
                         android:scaleType="centerCrop"
                         android:contentDescription="CIT MedConnect Logo" />
                 </FrameLayout>

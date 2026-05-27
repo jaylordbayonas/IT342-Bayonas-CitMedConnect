@@ -1,10 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@color/primary_red" />
 
+    <!-- Diagonal gradient: vibrant red → rich crimson → deep maroon -->
     <item>
-        <bitmap
-            android:src="@drawable/medconnect_logo"
-            android:gravity="center" />
+        <shape>
+            <gradient
+                android:type="linear"
+                android:angle="145"
+                android:startColor="#EF5350"
+                android:centerColor="#C62828"
+                android:endColor="#3E0000" />
+        </shape>
     </item>
+
+    <!-- Soft radial glow at center for depth -->
+    <item>
+        <shape>
+            <gradient
+                android:type="radial"
+                android:gradientRadius="300dp"
+                android:startColor="#28FFFFFF"
+                android:endColor="#00000000"
+                android:centerX="0.5"
+                android:centerY="0.42" />
+        </shape>
+    </item>
+
+    <!-- Logo: fixed 220dp box centered on screen, fills to fit fully -->
+    <item
+        android:gravity="center"
+        android:width="220dp"
+        android:height="220dp">
+        <bitmap
+            android:src="@drawable/medconnet_appiconv2"
+            android:gravity="fill" />
+    </item>
+
 </layer-list>

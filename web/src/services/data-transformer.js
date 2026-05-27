@@ -12,16 +12,15 @@ export const transformAppointment = (apt) => {
     // Extract date and time from nested timeSlot object
     const scheduledDate = apt.timeSlot?.slotDate || apt.scheduledDate || apt.date || apt.appointmentDate;
     const scheduledTime = apt.timeSlot?.startTime || apt.scheduledTime || apt.time || apt.appointmentTime;
-    
-    // Extract student ID from nested user object
-    const studentId = apt.user?.schoolId || apt.studentId || apt.userId;
+
+    // Extract student ID — check nested user object first, then top-level fields
+    const studentId = apt.user?.schoolId || apt.schoolId || apt.studentId || apt.userId;
     
     console.log('Extracted scheduledDate:', scheduledDate);
     console.log('Extracted scheduledTime:', scheduledTime);
     console.log('Extracted studentId:', studentId);
     
-    const rawStatus = (apt.status || 'SCHEDULED').toString().toLowerCase();
-    const status = rawStatus === 'pending' || rawStatus === 'confirmed' ? 'scheduled' : rawStatus;
+    const status = (apt.status || 'pending').toString().toLowerCase();
 
     const transformed = {
         // Core appointment fields

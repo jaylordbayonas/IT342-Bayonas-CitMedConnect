@@ -29,7 +29,7 @@ const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  const logo = '/images/logo.jpg';
+  const logo = '/images/medconnet_appiconv2.png';
 
   // ============================================
   // EVENT HANDLERS
